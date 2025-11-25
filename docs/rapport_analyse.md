@@ -128,11 +128,22 @@ La partie se termine quand un joueur n’a plus de tuiles ou que la pioche est v
 Les structures principales modélisent les tuiles, les joueurs et la partie
 Elles doivent être simples, dynamiques et réutilisables dans les modules du projet
 
-[ A FAIRE]
+![conception](img/conception.jpg)
 
-Ces structures permettent :
+Description fonctionnelle des modèles de données :
 
-[ A FAIRE] 
+* La structure **Tuile** représente une tuile, on lui associe une valeur allant de 1 à 13 (13 représentant un joker) et une couleur allant de 1 à 4 (respectivement BLEU, VERT, ROUGE, ORANGE)
+
+* La structure **Combinaison** représente une combinaison de `Tuile`.
+
+* La structure **Groupe** représente une `Combinaison` de tuile toute de même valeur
+
+* La structure **Suite** représente une `Combinaison` de tuile toute de même couleur
+
+* La structure **Joueur** représente un joueur, il possède un nom d'utilisateur, un score ainsi qu'une main de `Tuiles`
+
+* La structure **Board** représente le plateau du jeu, il contient une liste de `Combinaison`
+
 
 ---
 
