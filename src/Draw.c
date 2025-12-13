@@ -33,9 +33,9 @@ void init_deck(Deck *d) {
   }
 
   // Ajout des 2 Jokers
-  d->tiles[index] = (Tile){index, 0, JOKER, 1};
+  d->tiles[index] = (Tile){index, 0, NOIR, 1};
   index++;
-  d->tiles[index] = (Tile){index, 0, JOKER, 1};
+  d->tiles[index] = (Tile){index, 0, ROUGE, 1};
   index++;
 
   d->top = MAX_TILES;
