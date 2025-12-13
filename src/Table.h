@@ -1,4 +1,4 @@
-#include "Structure.h"
+#include "structs.h"
 // Initialise le plateau (vide au début)
 void init_table(Table *t); // Supposant que tu crées une struct Table contenant un tableau de Combinaisons
 

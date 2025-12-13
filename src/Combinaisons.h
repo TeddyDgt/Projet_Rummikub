@@ -1,4 +1,4 @@
-#include "Structure.h"
+#include "structs.h"
 // Vérifie si une combinaison est un Groupe valide (3-4 tuiles, même valeur, couleurs diff)
 int is_valid_group(Combinaison *c);
 

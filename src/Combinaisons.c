@@ -1,4 +1,4 @@
-#include "Structure.h"
+#include "./structs.h"
 #include "Combinaisons.h"
 // Fonction : Vérifier un GROUPE (3 ou 4 mêmes valeurs, couleurs différentes)
 int is_valid_group(Combinaison *c) {

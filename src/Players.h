@@ -1,4 +1,4 @@
-#include "Structure.h"
+#include "structs.h"
 // Initialise un joueur (nom, score à 0, main vide)
 void init_player(Player *p, char *nom);
 

@@ -1,4 +1,4 @@
-#include "Structure.h"
+#include "structs.h"
 // Distribue 14 tuiles à chaque joueur au début
 void distribute_initial_tiles(Deck *d, Player players[], int num_players);
 
