@@ -2,11 +2,11 @@
 #define GAME_LOGIC_H
 
 #include "structure.h"
+#include "Pioche.h"
+#include "Combinaisons.h"
+#include "Joueurs.h"
+#include "Table.h"
+#include "TourFinJeu.h"
 
-// Prototypes des fonctions
-void init_deck(Deck *d);
-Tile draw_tile(Deck *d);
-int is_valid_group(Combinaison *c);
-int is_valid_suite(Combinaison *c);
 
 #endif

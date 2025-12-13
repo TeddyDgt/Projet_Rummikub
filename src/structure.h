@@ -7,6 +7,8 @@
 #define JOKER_VALUE 30 
 #define IS_GROUPE 1
 #define IS_SUITE 2
+#define MAX_COMB 100
+#define MAX_PLAYERS 4
 
 // Enumérations pour la lisibilité
 typedef enum { NOIR=1, ROUGE=2, BLEU=3, JAUNE=4 } Color;
@@ -39,5 +41,8 @@ typedef struct {
     Tile tiles[MAX_TILES];
     int top; // Indice de la prochaine tuile à piocher (ou nombre restant)
 } Deck;
-
+typedef struct {
+    Combinaison table[MAX_COMB];
+    int count;
+} Table;
 #endif
