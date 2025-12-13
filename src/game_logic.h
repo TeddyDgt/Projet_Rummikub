@@ -6,7 +6,7 @@
 #include "Combinaisons.h"
 #include "Players.h"
 #include "Table.h"
-#include "TourFinJeu.h"
+#include "GameLoop.h"
 
 
 #endif
