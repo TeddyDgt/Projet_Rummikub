@@ -11,7 +11,7 @@
 #define MAX_PLAYERS 4
 
 // Enumérations pour la lisibilité
-typedef enum { NOIR=1, ROUGE=2, BLEU=3, JAUNE=4 } Color;
+typedef enum { NOIR=1, ROUGE=2, BLEU=3, JAUNE=4, JOKER=5} Color;
 
 // Structure d'une Tuile
 typedef struct {
