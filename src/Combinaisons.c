@@ -37,7 +37,7 @@ int is_valid_suite(Combinaison *c) {
 
     if (ref_col == -1)
       ref_col = c->tiles[i].color;
-    else if (c->tiles[i].color != ref_col)
+    else if (c->tiles[i].color != (Color)ref_col)
       return 0;
 
     if (i > 0 && !c->tiles[i - 1].is_joker) {

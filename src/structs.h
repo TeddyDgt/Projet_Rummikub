@@ -30,7 +30,7 @@ typedef struct {
 
 // Structure du Joueur
 typedef struct {
-  char name[50];
+  char* name;
   int score;
   Tile *hand;     // Main du joueur (tableau dynamique)
   int hand_count; // Nombre de tuiles en main

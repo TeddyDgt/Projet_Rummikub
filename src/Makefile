@@ -15,6 +15,6 @@ $(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o $(EXEC)
+	rm -f *.o $(EXEC) *.txt
 
 re: clean all

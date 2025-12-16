@@ -3,7 +3,7 @@
 void distribute_initial_tiles(Deck *d, Player players[], int num_players);
 
 // Détermine qui commence (celui qui pioche la plus grosse tuile)
-int determine_first_player(Deck *d, Player players[], int num_players);
+int determine_first_player(Deck *d, int num_players);
 
 // Vérifie si la partie est terminée (un joueur n'a plus de tuiles ou pioche vide bloquée)
 int is_game_over(Player players[], int num_players, Deck *d);
