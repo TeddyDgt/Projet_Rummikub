@@ -30,7 +30,7 @@ typedef struct {
 
 // Structure du Joueur
 typedef struct {
-  char* name;
+  char *name;
   int score;
   Tile *hand;     // Main du joueur (tableau dynamique)
   int hand_count; // Nombre de tuiles en main
@@ -41,6 +41,7 @@ typedef struct {
   Tile tiles[MAX_TILES];
   int top; // Indice de la prochaine tuile à piocher (ou nombre restant)
 } Deck;
+
 typedef struct {
   Combinaison table[MAX_COMB];
   int count;

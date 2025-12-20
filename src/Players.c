@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *color_to_str(Color c) {
+char *color_to_str(Color c) {
   switch (c) {
   case NOIR:
     return "NOIR";
@@ -33,9 +33,10 @@ int cmp_by_value_then_color(const void *a, const void *b) {
   return (int)ta->color - (int)tb->color;
 }
 
-void sort_by_value(Tile* hand, int length) {
-  Tile* temp_hand = (Tile*)malloc(length * sizeof(Tile));
-  if (!temp_hand) return;
+void sort_by_value(Tile *hand, int length) {
+  Tile *temp_hand = (Tile *)malloc(length * sizeof(Tile));
+  if (!temp_hand)
+    return;
 
   memcpy(temp_hand, hand, length * sizeof(Tile));
 
@@ -55,9 +56,10 @@ void sort_by_value(Tile* hand, int length) {
   free(temp_hand);
 }
 
-void sort_by_color(Tile* hand, int length) {
-  Tile* temp_hand = (Tile*)malloc(length * sizeof(Tile));
-  if (!temp_hand) return;
+void sort_by_color(Tile *hand, int length) {
+  Tile *temp_hand = (Tile *)malloc(length * sizeof(Tile));
+  if (!temp_hand)
+    return;
 
   memcpy(temp_hand, hand, length * sizeof(Tile));
 
@@ -97,10 +99,9 @@ void init_player(Player *p, char *nom) {
   p->name = nom;
 }
 
-
-
 void add_tile_to_player(Player *p, Tile t) {
-  Tile *new_hand = (Tile *)realloc(p->hand, (size_t)(p->hand_count + 1) * sizeof(Tile));
+  Tile *new_hand =
+      (Tile *)realloc(p->hand, (size_t)(p->hand_count + 1) * sizeof(Tile));
   if (!new_hand) {
     fprintf(stderr, "Le realloc de la main du joueur n'a pas fonctionné\n");
     return;
@@ -134,7 +135,8 @@ int remove_tile_from_player(Player *p, int tile_id) {
     return 1;
   }
 
-  Tile *new_hand = (Tile *)realloc(p->hand, (size_t)p->hand_count * sizeof(Tile));
+  Tile *new_hand =
+      (Tile *)realloc(p->hand, (size_t)p->hand_count * sizeof(Tile));
   if (new_hand) {
     p->hand = new_hand;
   }
@@ -172,4 +174,22 @@ void print_player_hand(Player *p) {
       printf("  [id=%d] %d %s\n", t.id, t.value, color_to_str(t.color));
     }
   }
+}
+
+void print_combinaisons(Combinaison *c, int length) {
+  for (int i = 0; i < length; i++) {
+    printf("Combinaison %i :\n", i+1);
+    for (int j = 0; j < c->count; j++) {
+      if (c[i].tiles[j].is_joker) {
+        printf("  [id=%d] JOKER (%s)\n", c[i].tiles[j].id, color_to_str(c[i].tiles[j].color));
+      } else {
+        printf("  [id=%d] %d %s\n", c[i].tiles[j].id, c[i].tiles[j].value, color_to_str(c[i].tiles[j].color));
+      }
+    }
+    printf("\n");
+  }
+}
+
+void register_player_move(Player *p, Table *table, Combinaison *combinaisons) {
+  // premier tour les combinaisons doivent faire >= 30
 }

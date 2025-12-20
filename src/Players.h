@@ -17,3 +17,5 @@ int calculate_hand_penalty(Player *p);
 
 // Affiche la main (pour le mode console/debug)
 void print_player_hand(Player *p);
+
+void print_combinaisons(Combinaison *c, int length);

@@ -2,6 +2,7 @@
 
 #include "Draw.h"
 #include "Players.h"
+#include "structs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +50,8 @@ int is_game_over(Player players[], int num_players, Deck *d) {
       return 1;
   }
 
-  // Minimal condition: deck empty => game ends (you can enhance later: "blocked" logic)
+  // Minimal condition: deck empty => game ends (you can enhance later:
+  // "blocked" logic)
   if (d && d->top <= 0)
     return 1;
 
@@ -97,4 +99,52 @@ void save_scores_to_file(Player players[], int num_players, char *filename) {
   }
   fprintf(f, "\n");
   fclose(f);
+}
+
+Tile find_tile(Player *p, int id) {
+    for (int i = 0; i < p->hand_count; i++) {
+        if (p->hand[i].id == id) return p->hand[i];
+    }
+    Tile err = {-1, 0, 0, 0}; 
+    return err;
+}
+
+Combinaison* parse_player_move_terminal(Player* p, char *input, int *out_count) {
+    Combinaison *liste = NULL;
+    int nb_combs = 0;
+
+    char *saveptr_grp, *saveptr_id;
+    char *groupe_str = strtok_r(input, " ", &saveptr_grp);
+
+    while (groupe_str != NULL) {
+        Combinaison comb_temp;
+        comb_temp.tiles = NULL;
+        comb_temp.count = 0;
+        comb_temp.type = 0; 
+
+        char *id_str = strtok_r(groupe_str, ",", &saveptr_id);
+        while (id_str != NULL) {
+            int id = atoi(id_str);
+            Tile t = find_tile(p, id);
+
+            if (t.id != -1) {
+                comb_temp.count++;
+                comb_temp.tiles = realloc(comb_temp.tiles, sizeof(Tile) * comb_temp.count);
+                comb_temp.tiles[comb_temp.count - 1] = t;
+            }
+            id_str = strtok_r(NULL, ",", &saveptr_id);
+        }
+
+        if (comb_temp.count > 0) {
+            nb_combs++;
+            liste = realloc(liste, sizeof(Combinaison) * nb_combs);
+            liste[nb_combs - 1] = comb_temp;
+        }
+
+        groupe_str = strtok_r(NULL, " ", &saveptr_grp);
+    }
+
+    *out_count = nb_combs;
+    
+    return liste;
 }

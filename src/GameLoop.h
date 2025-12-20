@@ -13,3 +13,5 @@ void calculate_final_scores(Player players[], int num_players);
 
 // Sauvegarde les scores/pseudos dans un fichier (Requis par le PDF)
 void save_scores_to_file(Player players[], int num_players, char *filename);
+
+Combinaison* parse_player_move_terminal(Player* p, char *input, int *out_count);

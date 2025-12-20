@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "game_logic.h"
+#include "structs.h"
 
 void free_players(Player players[], int n) {
   for (int i = 0; i < n; i++) {
@@ -12,21 +13,22 @@ void free_players(Player players[], int n) {
 }
 
 int main(void) {
-  Deck deck;
+
+  Deck stack;
   Table table;
   Player players[2];
   int num_players = 2;
 
-  init_deck(&deck);
+  init_deck(&stack);
   init_table(&table);
 
   init_player(&players[0], "Alice");
   init_player(&players[1], "Bob");
 
-  int first = determine_first_player(&deck, num_players);
+  int first = determine_first_player(&stack, num_players);
   printf("Joueur qui commence: %s\n\n", players[first].name);
 
-  distribute_initial_tiles(&deck, players, num_players);
+  distribute_initial_tiles(&stack, players, num_players);
   for (int i = 0; i < num_players; i++) {
     print_player_hand(&players[i]);
     printf("\n");
@@ -36,17 +38,27 @@ int main(void) {
   // (Le vrai placement sur la table viendra ensuite.)
   int current = first;
   int turn = 1;
-  while (!is_game_over(players, num_players, &deck) && turn <= 20) {
+  char player_input[256];
+  int nbr_combinaison_player_input;
+  Combinaison* played_combinaisons_by_player;
+  while (!is_game_over(players, num_players, &stack) && turn <= 20) {
     printf("--- Tour %d: %s ---\n", turn, players[current].name);
-    if (deck.top > 0) {
-      Tile t = draw_tile(&deck);
-      add_tile_to_player(&players[current], t);
+    if (stack.top > 0) {
+      Tile t = draw_tile(&stack);
+      print_player_hand(&players[current]);
+      // TODO : faire un do while : si combinaisons donnés ne sont valide ni dans la table ni toute seule alors on recommence
+      printf("%s tuiles à jouer: ", players[current].name);
+      scanf("%s", player_input);
+      // parse player marche pas ?
+      played_combinaisons_by_player = parse_player_move_terminal(&players[current], player_input, &nbr_combinaison_player_input);
+      print_combinaisons(played_combinaisons_by_player, nbr_combinaison_player_input);
       sort_player_hand(&players[current], 1);
+      add_tile_to_player(&players[current], t);
       printf("%s pioche une tuile (id=%d).\n", players[current].name, t.id);
     } else {
       printf("Pioche vide.\n");
     }
-    printf("Tuiles restantes dans la pioche: %d\n\n", deck.top);
+    printf("Tuiles restantes dans la pioche: %d\n\n", stack.top);
 
     current = (current + 1) % num_players;
     turn++;

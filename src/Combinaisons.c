@@ -24,7 +24,8 @@ int is_valid_group(Combinaison *c) {
   return 1;
 }
 
-// On veut une suite d'au moins 3 tuiles de même couleur et de valeur incrémentale (1, 2, 3 etc...)
+// On veut une suite d'au moins 3 tuiles de même couleur et de valeur
+// incrémentale (1, 2, 3 etc...)
 int is_valid_suite(Combinaison *c) {
   if (c->count < 3)
     return 0;
@@ -51,5 +52,5 @@ int is_valid_suite(Combinaison *c) {
 }
 
 int is_valid_combination(Combinaison *c) {
-    return is_valid_group(c) || is_valid_suite(c);
+  return is_valid_group(c) || is_valid_suite(c);
 }
