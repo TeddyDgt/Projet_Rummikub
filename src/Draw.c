@@ -2,14 +2,11 @@
 #include "structs.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 void shuffle(Tile *array, unsigned int n) {
   if (n > 1) {
-    size_t i;
-    for (i = 0; i < n - 1; i++) {
-      // C'est magique
-      int j = i + rand() / (RAND_MAX / (n - i) + 1);
+    for (unsigned int i = 0; i < n - 1; i++) {
+      unsigned int j = i + rand() % (n - i);
       Tile t = array[j];
       array[j] = array[i];
       array[i] = t;

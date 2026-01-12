@@ -12,6 +12,12 @@ int remove_tile_from_player(Player *p, int tile_id);
 // Trie la main du joueur (par couleur ou par valeur) - Bonus UX
 void sort_player_hand(Player *p, int by_color);
 
+Tile find_tile(Player *p, int id);
+
+void remove_tile_from_hand(Player *p, int tile_id);
+
+void add_to_table(Table *t, Combinaison c);
+
 // Calcule la somme des points restants en main (pour le score de fin)
 int calculate_hand_penalty(Player *p);
 
@@ -19,3 +25,5 @@ int calculate_hand_penalty(Player *p);
 void print_player_hand(Player *p);
 
 void print_combinaisons(Combinaison *c, int length);
+
+void add_tile_to_player(Player *p, Tile t);
