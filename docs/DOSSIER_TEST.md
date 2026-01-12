@@ -160,11 +160,11 @@ La création de la fenêtre et l'exécution de la boucle principale peuvent êtr
         </tr>
         <tr>
             <td style='border: 1px solid black;text-align: left'>Résultat :</td>
-            <td style='border: 1px solid black;text-align: left'>A exécuter ultérieurement</td>
+            <td style='border: 1px solid black;text-align: left'>OK</td>
         </tr>
         <tr>
             <td style='border: 1px solid black;text-align: left'>Occurences des résultats :</td>
-            <td style='border: 1px solid black;text-align: left'>A exécuter ultérieurement</td>
+            <td style='border: 1px solid black;text-align: left'>Systèmatique</td>
         </tr>
     </tbody>
 </table>
