@@ -1,0 +1,37 @@
+# ===== Build / exécutables =====
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.a
+*.o
+*.obj
+
+# Dossiers de build
+build/
+bin/
+
+# ===== CMake / Make =====
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.user
+
+# ===== MSYS2 / MinGW =====
+*.stackdump
+
+# ===== Logs / temporaires =====
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.code-workspace
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
