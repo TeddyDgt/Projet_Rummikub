@@ -158,3 +158,22 @@ void gui_get_framebuffer_size(GuiWindow* w, int* out_w, int* out_h) {
     if (out_w) *out_w = fw;
     if (out_h) *out_h = fh;
 }
+
+void gui_get_mouse_pos(GuiWindow* w, double* out_x, double* out_y) {
+    if (!w || !w->handle) {
+        if (out_x) *out_x = 0.0;
+        if (out_y) *out_y = 0.0;
+        return;
+    }
+    glfwGetCursorPos(w->handle, out_x, out_y);
+}
+
+bool gui_mouse_button_down(GuiWindow* w, int button) {
+    if (!w || !w->handle) return false;
+    return glfwGetMouseButton(w->handle, button) == GLFW_PRESS;
+}
+
+bool gui_key_down(GuiWindow* w, int key) {
+    if (!w || !w->handle) return false;
+    return glfwGetKey(w->handle, key) == GLFW_PRESS;
+}

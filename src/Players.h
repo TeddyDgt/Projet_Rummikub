@@ -27,3 +27,5 @@ void print_player_hand(Player *p);
 void print_combinaisons(Combinaison *c, int length);
 
 void add_tile_to_player(Player *p, Tile t);
+
+void free_players(Player players[], int n);
