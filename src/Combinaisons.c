@@ -55,7 +55,7 @@ int is_valid_suite(Combinaison *c) {
     if (c->tiles[i].is_joker)
       continue;
 
-    if (c->tiles[i].color != ref_col)
+    if ((int)c->tiles[i].color != ref_col)
       return 0;
 
     // La valeur doit correspondre à sa position par rapport à la première tuile
@@ -99,4 +99,51 @@ int add_tile_to_table_comb(Table *t, int comb_idx, Tile new_tile) {
 
 int is_valid_combination(Combinaison *c) {
   return is_valid_group(c) || is_valid_suite(c);
+}
+
+int combinaison_points(const Combinaison *c) {
+  if (!c || c->count <= 0 || !c->tiles) {
+    return 0;
+  }
+
+  if (is_valid_group((Combinaison *)c)) {
+    int ref_val = -1;
+    for (int i = 0; i < c->count; i++) {
+      if (!c->tiles[i].is_joker) {
+        ref_val = c->tiles[i].value;
+        break;
+      }
+    }
+    if (ref_val <= 0) {
+      return 0;
+    }
+    return ref_val * c->count;
+  }
+
+  if (is_valid_suite((Combinaison *)c)) {
+    int ref_col = -1;
+    int first_val = -1;
+    int first_val_idx = -1;
+
+    for (int i = 0; i < c->count; i++) {
+      if (!c->tiles[i].is_joker) {
+        ref_col = c->tiles[i].color;
+        first_val = c->tiles[i].value;
+        first_val_idx = i;
+        break;
+      }
+    }
+    if (ref_col == -1 || first_val <= 0) {
+      return 0;
+    }
+
+    int sum = 0;
+    for (int i = 0; i < c->count; i++) {
+      int expected_val = first_val + (i - first_val_idx);
+      sum += expected_val;
+    }
+    return sum;
+  }
+
+  return 0;
 }

@@ -9,6 +9,7 @@
 #include "Table.h"
 
 #include "ui_input.h"
+#include "ui_persist.h"
 #include "ui_rect.h"
 #include "ui_text.h"
 #include "ui_util.h"
@@ -88,8 +89,11 @@ static void menu_start_match(GuiGame *game) {
             name = fallback;
         }
         init_player(&game->players[i], (char *)name);
+        game->players[i].is_ai = game->menu_is_ai[i] ? 1 : 0;
+        game->players[i].has_initial_meld = 0;
     }
     game->players_initialized = true;
+    ui_persist_save_players(game->menu_player_names, game->menu_is_ai, game->menu_player_count);
 
     game->current_player = determine_first_player(&game->deck, game->num_players);
     distribute_initial_tiles(&game->deck, game->players, game->num_players);
@@ -100,6 +104,15 @@ static void menu_start_match(GuiGame *game) {
     game->active_comb_index = -1;
     game->last_player = game->current_player;
     game->last_hand_count = game->players[game->current_player].hand_count;
+    if (game->current_player >= 0 && game->current_player < game->num_players) {
+        Player *p = &game->players[game->current_player];
+        memcpy(game->hand_backup, p->hand, sizeof(Tile) * (size_t)p->hand_count);
+        game->hand_backup_count = p->hand_count;
+    }
+    game->turn_points = 0;
+    game->turn_played = false;
+    game->drag_pending = false;
+    game->dragging = false;
     ui_input_reset(game);
     game->state = GUI_STATE_MATCH;
 }
@@ -142,11 +155,22 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                              names_panel.y + (float)i * (row_h + row_gap),
                              names_panel.w,
                              row_h);
+        Rect ai_btn = rect_make(row.x + row.w - 80.0f, row.y + 6.0f, 70.0f, row.h - 12.0f);
         float bg = (i == game->menu_selected_name) ? 0.20f : 0.14f;
         r2d_fill_rect(row.x, row.y, row.w, row.h, bg, bg + 0.02f, bg + 0.03f, 1.0f);
         r2d_stroke_rect(row.x, row.y, row.w, row.h, 0.40f, 0.40f, 0.40f, 1.0f, 2.0f);
         ui_draw_text(row.x + 12.0f, row.y + 10.0f, 1.6f, game->menu_player_names[i],
                      0.90f, 0.90f, 0.90f, 1.0f);
+
+        if (game->menu_is_ai[i]) {
+            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.20f, 0.28f, 0.38f, 1.0f);
+            r2d_stroke_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.50f, 0.70f, 0.90f, 1.0f, 2.0f);
+            ui_draw_text_centered(ai_btn, 1.3f, "IA", 0.92f, 0.92f, 0.92f, 1.0f);
+        } else {
+            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.18f, 0.18f, 0.18f, 1.0f);
+            r2d_stroke_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.45f, 0.45f, 0.45f, 1.0f, 2.0f);
+            ui_draw_text_centered(ai_btn, 1.1f, "HUM", 0.90f, 0.90f, 0.90f, 1.0f);
+        }
     }
 
     r2d_fill_rect(create_btn.x, create_btn.y, create_btn.w, create_btn.h, 0.20f, 0.30f, 0.20f, 1.0f);
@@ -170,6 +194,7 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         } else if (point_in_rect((float)mx, (float)my, plus_btn)) {
             if (game->menu_player_count < 4) {
                 game->menu_player_count++;
+                game->menu_is_ai[game->menu_player_count - 1] = false;
             }
         } else if (point_in_rect((float)mx, (float)my, create_btn)) {
             menu_start_match(game);
@@ -179,6 +204,11 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                                      names_panel.y + (float)i * (row_h + row_gap),
                                      names_panel.w,
                                      row_h);
+                Rect ai_btn = rect_make(row.x + row.w - 80.0f, row.y + 6.0f, 70.0f, row.h - 12.0f);
+                if (point_in_rect((float)mx, (float)my, ai_btn)) {
+                    game->menu_is_ai[i] = !game->menu_is_ai[i];
+                    break;
+                }
                 if (point_in_rect((float)mx, (float)my, row)) {
                     game->menu_selected_name = i;
                     break;

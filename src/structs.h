@@ -29,6 +29,8 @@ typedef struct {
   int score;
   Tile *hand;
   int hand_count;
+  int is_ai;
+  int has_initial_meld;
 } Player;
 
 typedef struct {

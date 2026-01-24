@@ -3,7 +3,9 @@
 #include "platform/gui_platform.h"
 #include "gfx/renderer2d.h"
 
+#include "Draw.h"
 #include "Combinaisons.h"
+#include "GameLoop.h"
 #include "Players.h"
 #include "Table.h"
 
@@ -15,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     Rect rect;
@@ -60,6 +63,289 @@ static void hand_move_tile(Player *p, bool *selected, int from, int to) {
     }
 }
 
+static void backup_hand(GuiGame *game, Player *p) {
+    if (!game || !p) {
+        return;
+    }
+    if (p->hand_count <= 0) {
+        game->hand_backup_count = 0;
+        return;
+    }
+    memcpy(game->hand_backup, p->hand, sizeof(Tile) * (size_t)p->hand_count);
+    game->hand_backup_count = p->hand_count;
+}
+
+static void restore_hand(GuiGame *game, Player *p) {
+    if (!game || !p) {
+        return;
+    }
+    if (game->hand_backup_count <= 0) {
+        p->hand_count = 0;
+        return;
+    }
+    memcpy(p->hand, game->hand_backup, sizeof(Tile) * (size_t)game->hand_backup_count);
+    p->hand_count = game->hand_backup_count;
+}
+
+static void reset_drag_state(GuiGame *game) {
+    if (!game) {
+        return;
+    }
+    game->drag_pending = false;
+    game->dragging = false;
+    game->drag_candidate_index = -1;
+    game->drag_hand_index = -1;
+}
+
+static bool handle_game_over(GuiGame *game) {
+    if (!game) {
+        return false;
+    }
+    if (!is_game_over(game->players, game->num_players, &game->deck)) {
+        return false;
+    }
+
+    calculate_final_scores(game->players, game->num_players);
+    save_scores_to_file(game->players, game->num_players, "scores.txt");
+
+    printf("[UI] Partie terminee. Scores sauvegardes dans scores.txt\n");
+
+    if (game->players_initialized) {
+        free_players(game->players, game->num_players);
+        game->players_initialized = false;
+    }
+    free_table(&game->table);
+    free_table(&game->table_backup);
+    init_table(&game->table);
+    init_table(&game->table_backup);
+
+    game->state = GUI_STATE_MENU;
+    ui_input_reset(game);
+    return true;
+}
+
+static void begin_turn(GuiGame *game) {
+    if (!game) {
+        return;
+    }
+    Player *p = &game->players[game->current_player];
+    backup_hand(game, p);
+    game->turn_points = 0;
+    game->turn_played = false;
+    ui_clear_selection(game->selected, MAX_TILES);
+    game->active_comb_index = -1;
+    reset_drag_state(game);
+}
+
+static void end_turn(GuiGame *game) {
+    if (!game) {
+        return;
+    }
+    if (handle_game_over(game)) {
+        return;
+    }
+    free_table(&game->table_backup);
+    game->table_backup = clone_table(&game->table);
+    game->current_player = (game->current_player + 1) % game->num_players;
+    game->last_player = game->current_player;
+    game->last_hand_count = game->players[game->current_player].hand_count;
+    begin_turn(game);
+}
+
+static void ai_fill_index(Player *p, int tile_index[5][14]) {
+    for (int c = 0; c < 5; c++) {
+        for (int v = 0; v < 14; v++) {
+            tile_index[c][v] = -1;
+        }
+    }
+    for (int i = 0; i < p->hand_count; i++) {
+        Tile *t = &p->hand[i];
+        if (t->is_joker) {
+            continue;
+        }
+        if (t->color >= 1 && t->color <= 4 && t->value >= 1 && t->value <= 13) {
+            if (tile_index[t->color][t->value] == -1) {
+                tile_index[t->color][t->value] = i;
+            }
+        }
+    }
+}
+
+static bool ai_pick_group(Player *p, const int tile_index[5][14], Combinaison *out, int *out_points) {
+    int best_points = 0;
+    int best_val = 0;
+    int best_indices[4] = {0};
+    int best_count = 0;
+
+    for (int val = 1; val <= 13; val++) {
+        int indices[4];
+        int count = 0;
+        for (int color = 1; color <= 4; color++) {
+            int idx = tile_index[color][val];
+            if (idx >= 0) {
+                indices[count++] = idx;
+            }
+        }
+        if (count >= 3) {
+            int use = count > 4 ? 4 : count;
+            int points = val * use;
+            if (points > best_points) {
+                best_points = points;
+                best_val = val;
+                best_count = use;
+                for (int i = 0; i < use; i++) {
+                    best_indices[i] = indices[i];
+                }
+            }
+        }
+    }
+
+    if (best_points <= 0 || best_count < 3) {
+        return false;
+    }
+
+    out->count = best_count;
+    out->type = IS_GROUPE;
+    out->tiles = (Tile *)malloc(sizeof(Tile) * (size_t)best_count);
+    for (int i = 0; i < best_count; i++) {
+        out->tiles[i] = p->hand[best_indices[i]];
+    }
+    if (out_points) {
+        *out_points = best_val * best_count;
+    }
+    return true;
+}
+
+static bool ai_pick_suite(Player *p, const int tile_index[5][14], Combinaison *out, int *out_points) {
+    int best_len = 0;
+    int best_color = 0;
+    int best_start = 0;
+
+    for (int color = 1; color <= 4; color++) {
+        int v = 1;
+        while (v <= 13) {
+            if (tile_index[color][v] >= 0) {
+                int start = v;
+                while (v <= 13 && tile_index[color][v] >= 0) {
+                    v++;
+                }
+                int len = v - start;
+                if (len >= 3 && len > best_len) {
+                    best_len = len;
+                    best_color = color;
+                    best_start = start;
+                }
+            } else {
+                v++;
+            }
+        }
+    }
+
+    if (best_len < 3) {
+        return false;
+    }
+
+    out->count = best_len;
+    out->type = IS_SUITE;
+    out->tiles = (Tile *)malloc(sizeof(Tile) * (size_t)best_len);
+    int sum = 0;
+    for (int i = 0; i < best_len; i++) {
+        int val = best_start + i;
+        int idx = tile_index[best_color][val];
+        out->tiles[i] = p->hand[idx];
+        sum += val;
+    }
+    if (out_points) {
+        *out_points = sum;
+    }
+    return true;
+}
+
+static bool ai_pick_best_combination(Player *p, Combinaison *out, int *out_points) {
+    int tile_index[5][14];
+    ai_fill_index(p, tile_index);
+
+    Combinaison group = {0};
+    Combinaison suite = {0};
+    int points_group = 0;
+    int points_suite = 0;
+    bool has_group = ai_pick_group(p, tile_index, &group, &points_group);
+    bool has_suite = ai_pick_suite(p, tile_index, &suite, &points_suite);
+
+    if (has_group && (!has_suite || points_group >= points_suite)) {
+        *out = group;
+        if (out_points) {
+            *out_points = points_group;
+        }
+        if (suite.tiles) {
+            free(suite.tiles);
+        }
+        return true;
+    }
+
+    if (has_suite) {
+        *out = suite;
+        if (out_points) {
+            *out_points = points_suite;
+        }
+        if (group.tiles) {
+            free(group.tiles);
+        }
+        return true;
+    }
+
+    if (group.tiles) {
+        free(group.tiles);
+    }
+    if (suite.tiles) {
+        free(suite.tiles);
+    }
+    return false;
+}
+
+static void ai_take_turn(GuiGame *game) {
+    if (!game) {
+        return;
+    }
+    Player *p = &game->players[game->current_player];
+    if (!p->is_ai) {
+        return;
+    }
+
+    Combinaison comb = {0};
+    int points = 0;
+    bool has_combo = ai_pick_best_combination(p, &comb, &points);
+
+    if (!p->has_initial_meld) {
+        if (!has_combo || points < 30) {
+            if (game->deck.top > 0) {
+                add_tile_to_player(p, draw_tile(&game->deck));
+            }
+            end_turn(game);
+            if (comb.tiles) {
+                free(comb.tiles);
+            }
+            return;
+        }
+        p->has_initial_meld = 1;
+    }
+
+    if (!has_combo) {
+        if (game->deck.top > 0) {
+            add_tile_to_player(p, draw_tile(&game->deck));
+        }
+        end_turn(game);
+        return;
+    }
+
+    add_combinaison_to_table(&game->table, comb);
+    for (int i = 0; i < comb.count; i++) {
+        remove_tile_from_hand(p, comb.tiles[i].id);
+    }
+    free(comb.tiles);
+    end_turn(game);
+}
+
 void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     const float margin = 20.0f;
     const float sidebar_w = 220.0f;
@@ -96,13 +382,17 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                                   action_w - 10.0f,
                                   bottom_area.h - 20.0f);
     Rect play_btn = rect_make(action_panel.x + 10.0f,
-                              action_panel.y + 12.0f,
+                              action_panel.y + 10.0f,
                               action_panel.w - 20.0f,
-                              48.0f);
+                              40.0f);
     Rect validate_btn = rect_make(action_panel.x + 10.0f,
-                                  action_panel.y + 70.0f,
+                                  action_panel.y + 58.0f,
                                   action_panel.w - 20.0f,
-                                  48.0f);
+                                  40.0f);
+    Rect draw_btn = rect_make(action_panel.x + 10.0f,
+                              action_panel.y + 106.0f,
+                              action_panel.w - 20.0f,
+                              40.0f);
 
     Rect rack_area = rect_make(bottom_area.x + sidebar_w + margin,
                                bottom_area.y + 10.0f,
@@ -114,6 +404,14 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     bool mouse_down = gui_mouse_button_down(w, GUI_MOUSE_LEFT);
     bool mouse_pressed = mouse_down && !game->prev_mouse_down;
     bool mouse_released = !mouse_down && game->prev_mouse_down;
+
+    if (game->players[game->current_player].is_ai) {
+        ai_take_turn(game);
+        if (game->state != GUI_STATE_MATCH) {
+            game->prev_mouse_down = mouse_down;
+            return;
+        }
+    }
 
     r2d_fill_rect(sidebar.x, sidebar.y, sidebar.w, sidebar.h, 0.11f, 0.12f, 0.13f, 1.0f);
     r2d_stroke_rect(sidebar.x, sidebar.y, sidebar.w, sidebar.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
@@ -141,6 +439,11 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         r2d_stroke_rect(panel.x, panel.y, panel.w, panel.h, 0.40f, 0.40f, 0.40f, 1.0f, 2.0f);
         ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
                      0.92f, 0.92f, 0.92f, 1.0f);
+        char info[64];
+        snprintf(info, sizeof(info), "Score: %d%s", game->players[i].score,
+                 game->players[i].is_ai ? " (IA)" : "");
+        ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
+                     0.85f, 0.85f, 0.85f, 1.0f);
     }
 
     r2d_fill_rect(sort_panel.x, sort_panel.y, sort_panel.w, sort_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
@@ -157,13 +460,54 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     r2d_fill_rect(action_panel.x, action_panel.y, action_panel.w, action_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
     r2d_stroke_rect(action_panel.x, action_panel.y, action_panel.w, action_panel.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
 
-    r2d_fill_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, 0.20f, 0.30f, 0.20f, 1.0f);
-    r2d_stroke_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
-    ui_draw_text_centered(play_btn, 1.6f, "JOUER", 0.95f, 0.95f, 0.95f, 1.0f);
+    bool hover_play = point_in_rect((float)mx, (float)my, play_btn);
+    bool hover_validate = point_in_rect((float)mx, (float)my, validate_btn);
+    bool hover_draw = point_in_rect((float)mx, (float)my, draw_btn);
 
-    r2d_fill_rect(validate_btn.x, validate_btn.y, validate_btn.w, validate_btn.h, 0.20f, 0.22f, 0.30f, 1.0f);
+    float play_r = 0.20f, play_g = 0.30f, play_b = 0.20f;
+    if (hover_play) {
+        play_r += 0.05f;
+        play_g += 0.05f;
+        play_b += 0.05f;
+    }
+    if (mouse_down && hover_play) {
+        play_r *= 0.8f;
+        play_g *= 0.8f;
+        play_b *= 0.8f;
+    }
+    r2d_fill_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, play_r, play_g, play_b, 1.0f);
+    r2d_stroke_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
+    ui_draw_text_centered(play_btn, 1.4f, "JOUER", 0.95f, 0.95f, 0.95f, 1.0f);
+
+    float val_r = 0.20f, val_g = 0.22f, val_b = 0.30f;
+    if (hover_validate) {
+        val_r += 0.05f;
+        val_g += 0.05f;
+        val_b += 0.05f;
+    }
+    if (mouse_down && hover_validate) {
+        val_r *= 0.8f;
+        val_g *= 0.8f;
+        val_b *= 0.8f;
+    }
+    r2d_fill_rect(validate_btn.x, validate_btn.y, validate_btn.w, validate_btn.h, val_r, val_g, val_b, 1.0f);
     r2d_stroke_rect(validate_btn.x, validate_btn.y, validate_btn.w, validate_btn.h, 0.60f, 0.70f, 0.90f, 1.0f, 2.0f);
-    ui_draw_text_centered(validate_btn, 1.6f, "VALIDER", 0.95f, 0.95f, 0.95f, 1.0f);
+    ui_draw_text_centered(validate_btn, 1.4f, "VALIDER", 0.95f, 0.95f, 0.95f, 1.0f);
+
+    float draw_r = 0.22f, draw_g = 0.20f, draw_b = 0.18f;
+    if (hover_draw) {
+        draw_r += 0.05f;
+        draw_g += 0.05f;
+        draw_b += 0.05f;
+    }
+    if (mouse_down && hover_draw) {
+        draw_r *= 0.8f;
+        draw_g *= 0.8f;
+        draw_b *= 0.8f;
+    }
+    r2d_fill_rect(draw_btn.x, draw_btn.y, draw_btn.w, draw_btn.h, draw_r, draw_g, draw_b, 1.0f);
+    r2d_stroke_rect(draw_btn.x, draw_btn.y, draw_btn.w, draw_btn.h, 0.70f, 0.60f, 0.50f, 1.0f, 2.0f);
+    ui_draw_text_centered(draw_btn, 1.2f, "PIOCHER", 0.95f, 0.95f, 0.95f, 1.0f);
 
     int grid_cols = 18;
     int grid_rows = 4;
@@ -357,11 +701,14 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
             if (drop_comb >= 0) {
                 Tile t = game->drag_tile;
-                if (add_tile_to_table_comb(&game->table, drop_comb, t)) {
+                if (!p->has_initial_meld && game->turn_points < 30) {
+                    printf("[UI] Premiere pose: au moins 30 points requis.\n");
+                } else if (add_tile_to_table_comb(&game->table, drop_comb, t)) {
                     remove_tile_from_hand(p, t.id);
                     game->active_comb_index = drop_comb;
                     ui_clear_selection(game->selected, MAX_TILES);
                     game->last_hand_count = p->hand_count;
+                    game->turn_played = true;
                 } else {
                     printf("[UI] Ajout impossible : combinaison invalide.\n");
                 }
@@ -397,9 +744,26 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         if (point_in_rect((float)mx, (float)my, sort_color_btn)) {
             sort_player_hand(p, 1);
             ui_clear_selection(game->selected, MAX_TILES);
+            if (!game->turn_played) {
+                backup_hand(game, p);
+            }
         } else if (point_in_rect((float)mx, (float)my, sort_value_btn)) {
             sort_player_hand(p, 0);
             ui_clear_selection(game->selected, MAX_TILES);
+            if (!game->turn_played) {
+                backup_hand(game, p);
+            }
+        } else if (point_in_rect((float)mx, (float)my, draw_btn)) {
+            if (game->turn_played) {
+                printf("[UI] Pioche impossible apres avoir joue.\n");
+            } else {
+                if (game->deck.top > 0) {
+                    add_tile_to_player(p, draw_tile(&game->deck));
+                }
+                end_turn(game);
+                game->prev_mouse_down = mouse_down;
+                return;
+            }
         } else if (point_in_rect((float)mx, (float)my, play_btn)) {
             int sel_idx[MAX_TILES];
             int sel_count = 0;
@@ -423,23 +787,31 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 int is_suite = is_valid_suite(&comb);
                 if (is_group || is_suite) {
                     comb.type = is_suite ? IS_SUITE : IS_GROUPE;
+                    int points = combinaison_points(&comb);
                     add_combinaison_to_table(&game->table, comb);
                     for (int i = 0; i < comb.count; i++) {
                         remove_tile_from_hand(p, comb.tiles[i].id);
                     }
                     game->active_comb_index = game->table.count - 1;
                     game->last_hand_count = p->hand_count;
+                    game->turn_played = true;
+                    if (!p->has_initial_meld) {
+                        game->turn_points += points;
+                    }
                 } else {
                     printf("[UI] Combinaison invalide (>=3 requis).\n");
                 }
                 free(comb.tiles);
                 ui_clear_selection(game->selected, MAX_TILES);
             } else if (sel_count == 1) {
-                if (game->active_comb_index >= 0) {
+                if (!p->has_initial_meld && game->turn_points < 30) {
+                    printf("[UI] Premiere pose: au moins 30 points requis.\n");
+                } else if (game->active_comb_index >= 0) {
                     Tile t = p->hand[sel_idx[0]];
                     if (add_tile_to_table_comb(&game->table, game->active_comb_index, t)) {
                         remove_tile_from_hand(p, t.id);
                         game->last_hand_count = p->hand_count;
+                        game->turn_played = true;
                     } else {
                         printf("[UI] Ajout impossible : combinaison invalide.\n");
                     }
@@ -451,20 +823,50 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 printf("[UI] Selection vide ou trop courte.\n");
             }
         } else if (point_in_rect((float)mx, (float)my, validate_btn)) {
+            if (!game->turn_played) {
+                if (game->deck.top > 0) {
+                    add_tile_to_player(p, draw_tile(&game->deck));
+                }
+                end_turn(game);
+                game->prev_mouse_down = mouse_down;
+                return;
+            }
+
+            if (!p->has_initial_meld && game->turn_points < 30) {
+                printf("[UI] Premiere pose: 30 points minimum, pioche et tour suivant.\n");
+                free_table(&game->table);
+                game->table = clone_table(&game->table_backup);
+                restore_hand(game, p);
+                ui_clear_selection(game->selected, MAX_TILES);
+                game->active_comb_index = -1;
+                game->turn_points = 0;
+                game->turn_played = false;
+                game->last_hand_count = p->hand_count;
+                if (game->deck.top > 0) {
+                    add_tile_to_player(p, draw_tile(&game->deck));
+                }
+                end_turn(game);
+                game->prev_mouse_down = mouse_down;
+                return;
+            }
+
             if (!verify_whole_table(&game->table)) {
                 printf("[UI] Table invalide, retour a l'etat precedent.\n");
                 free_table(&game->table);
                 game->table = clone_table(&game->table_backup);
+                restore_hand(game, p);
                 game->active_comb_index = -1;
                 ui_clear_selection(game->selected, MAX_TILES);
+                game->turn_points = 0;
+                game->turn_played = false;
+                game->last_hand_count = p->hand_count;
             } else {
-                free_table(&game->table_backup);
-                game->table_backup = clone_table(&game->table);
-                game->current_player = (game->current_player + 1) % game->num_players;
-                game->active_comb_index = -1;
-                ui_clear_selection(game->selected, MAX_TILES);
-                game->last_player = game->current_player;
-                game->last_hand_count = game->players[game->current_player].hand_count;
+                if (!p->has_initial_meld && game->turn_points >= 30) {
+                    p->has_initial_meld = 1;
+                }
+                end_turn(game);
+                game->prev_mouse_down = mouse_down;
+                return;
             }
         } else {
             int hit = 0;

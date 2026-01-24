@@ -2,6 +2,7 @@
 
 #include "Players.h"
 #include "Table.h"
+#include "ui_persist.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +22,9 @@ void gui_game_init(GuiGame *game) {
     for (int i = 0; i < 4; i++) {
         snprintf(game->menu_player_names[i], sizeof(game->menu_player_names[i]),
                  "Joueur %d", i + 1);
+        game->menu_is_ai[i] = false;
     }
+    ui_persist_load_players(game->menu_player_names, game->menu_is_ai, &game->menu_player_count);
     game->menu_selected_name = 0;
     game->players_initialized = false;
     init_table(&game->table);

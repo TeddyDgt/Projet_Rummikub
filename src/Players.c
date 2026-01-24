@@ -6,6 +6,8 @@ void init_player(Player *p, const char *name) {
   p->name = strdup(name);
   p->score = 0;
   p->hand_count = 0;
+  p->is_ai = 0;
+  p->has_initial_meld = 0;
   // ALLOCATION CRUCIALE : on réserve de la place pour éviter les IDs fantômes
   p->hand = malloc(sizeof(Tile) * MAX_TILES);
 }
@@ -31,6 +33,23 @@ void remove_tile_from_hand(Player *p, int tile_id) {
     }
     p->hand_count--;
   }
+}
+
+int remove_tile_from_player(Player *p, int tile_id) {
+  int before = p->hand_count;
+  remove_tile_from_hand(p, tile_id);
+  return p->hand_count != before;
+}
+
+int calculate_hand_penalty(Player *p) {
+  if (!p) {
+    return 0;
+  }
+  int penalty = 0;
+  for (int i = 0; i < p->hand_count; i++) {
+    penalty += (p->hand[i].is_joker) ? 30 : p->hand[i].value;
+  }
+  return penalty;
 }
 
 void sort_player_hand(Player *p, int by_color) {

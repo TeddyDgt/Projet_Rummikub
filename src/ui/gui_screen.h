@@ -23,6 +23,10 @@ typedef struct {
     int active_comb_index;
     int last_hand_count;
     int last_player;
+    Tile hand_backup[MAX_TILES];
+    int hand_backup_count;
+    int turn_points;
+    bool turn_played;
     bool prev_mouse_down;
     bool key_prev[512];
     bool drag_pending;
@@ -37,6 +41,7 @@ typedef struct {
     bool players_initialized;
     int menu_player_count;
     char menu_player_names[4][16];
+    bool menu_is_ai[4];
     int menu_selected_name;
     GuiState state;
 } GuiGame;
