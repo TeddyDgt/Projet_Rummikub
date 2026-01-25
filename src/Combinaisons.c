@@ -4,8 +4,8 @@
 int is_valid_group(Combinaison *c) {
   if (c->count < 3 || c->count > 4)
     return 0;
-  int ref_val = -1;
-  int colors[5] = {0};
+
+    int ref_val = -1;    int colors[5] = {0}; 
 
 
   for (int i = 0; i < c->count; i++) {
