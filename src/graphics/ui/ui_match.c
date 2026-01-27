@@ -738,8 +738,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     r2d_stroke_rect(draw_btn.x, draw_btn.y, draw_btn.w, draw_btn.h, 0.70f, 0.60f, 0.50f, 1.0f, 2.0f);
     ui_draw_text_centered(draw_btn, 1.2f, "PIOCHER", 0.95f, 0.95f, 0.95f, 1.0f);
 
-    int grid_cols = 18;
-    int grid_rows = 4;
+    int grid_cols = 20;
+    int grid_rows = 8;
     float grid_pad = 8.0f;
 
     float cell_w = (table_area.w - grid_pad * (grid_cols + 1)) / (float)grid_cols;

@@ -4,8 +4,8 @@ CFLAGS = -Wextra -Wall
 CONSOLE_SRC = $(filter-out main_opengl.c audio.c,$(wildcard *.c))
 CONSOLE_OBJ = $(CONSOLE_SRC:.c=.o)
 
-GUI_SRC = main_opengl.c platform/gui_platform.c gfx/renderer2d.c \
-          $(wildcard ui/*.c) Draw.c Players.c Table.c GameLoop.c Combinaisons.c audio.c
+GUI_SRC = graphics/main_opengl.c graphics/platform/gui_platform.c graphics/gfx/renderer2d.c \
+          $(wildcard graphics/ui/*.c) Draw.c Players.c Table.c GameLoop.c Combinaisons.c graphics/audio.c
 
 EXEC = main
 
@@ -17,6 +17,7 @@ GLFW_LIB_DEP =
 CMAKE ?= cmake
 GLFW_CMAKE_GEN ?=
 GLFW_CMAKE_FLAGS = -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXAMPLES=OFF
+CFLAGS += -Igraphics -I$(THIRD_PARTY)/miniaudio
 
 ifeq ($(OS),Windows_NT)
 GUI_EXEC = rummikub_gui.exe
@@ -62,7 +63,7 @@ $(EXEC): $(CONSOLE_OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(GUI_EXEC): $(GUI_SRC) $(GLFW_LIB_DEP)
-	$(CC) $(CFLAGS) -I. -Iplatform -Igfx -o $@ $^ $(PLATFORM_LIBS)
+	$(CC) $(CFLAGS) -I. -o $@ $^ $(PLATFORM_LIBS)
 
 $(GLFW_LIB):
 ifneq ($(USE_BUNDLED_GLFW),)

@@ -1,6 +1,7 @@
 # Build & Run (Windows / Linux)
 
 This project vendors GLFW in `third_party/glfw` and builds it automatically.
+Miniaudio is vendored in `third_party/miniaudio`.
 
 ## Linux
 Dependencies (Ubuntu/Debian):
