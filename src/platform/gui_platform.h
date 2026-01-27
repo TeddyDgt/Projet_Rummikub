@@ -23,5 +23,6 @@ typedef enum {
 void gui_get_mouse_pos(GuiWindow* w, double* out_x, double* out_y);
 bool gui_mouse_button_down(GuiWindow* w, int button);
 bool gui_key_down(GuiWindow* w, int key);
+double gui_get_time_seconds(void);
 
 #endif

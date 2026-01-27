@@ -1,5 +1,6 @@
 #include "gui_screen.h"
 
+#include "audio.h"
 #include "Players.h"
 #include "Table.h"
 #include "ui_persist.h"
@@ -29,6 +30,14 @@ void gui_game_init(GuiGame *game) {
     game->players_initialized = false;
     init_table(&game->table);
     init_table(&game->table_backup);
+
+    game->notification[0] = '\0';
+    game->notification_timer = 0.0f;
+    game->notification_kind = 0;
+    game->last_time = 0.0;
+
+    audio_init();
+    audio_play_bgm();
 }
 
 void gui_game_shutdown(GuiGame *game) {
@@ -42,4 +51,6 @@ void gui_game_shutdown(GuiGame *game) {
     }
     free_table(&game->table);
     free_table(&game->table_backup);
+
+    audio_shutdown();
 }

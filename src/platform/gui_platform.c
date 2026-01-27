@@ -177,3 +177,7 @@ bool gui_key_down(GuiWindow* w, int key) {
     if (!w || !w->handle) return false;
     return glfwGetKey(w->handle, key) == GLFW_PRESS;
 }
+
+double gui_get_time_seconds(void) {
+    return glfwGetTime();
+}

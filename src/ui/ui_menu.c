@@ -3,6 +3,7 @@
 #include "platform/gui_platform.h"
 #include "gfx/renderer2d.h"
 
+#include "audio.h"
 #include "Draw.h"
 #include "GameLoop.h"
 #include "Players.h"
@@ -113,6 +114,19 @@ static void menu_start_match(GuiGame *game) {
     game->turn_played = false;
     game->drag_pending = false;
     game->dragging = false;
+    game->drag_source = 0;
+    game->drag_candidate_index = -1;
+    game->drag_hand_index = -1;
+    game->drag_candidate_table_comb = -1;
+    game->drag_candidate_table_index = -1;
+    game->drag_table_comb = -1;
+    game->drag_table_index = -1;
+    game->drag_w = 0.0f;
+    game->drag_h = 0.0f;
+    game->notification[0] = '\0';
+    game->notification_timer = 0.0f;
+    game->notification_kind = 0;
+    game->last_time = 0.0;
     ui_input_reset(game);
     game->state = GUI_STATE_MATCH;
 }
@@ -191,12 +205,15 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                     game->menu_selected_name = game->menu_player_count - 1;
                 }
             }
+            audio_play_sfx(AUDIO_SFX_CLICK);
         } else if (point_in_rect((float)mx, (float)my, plus_btn)) {
             if (game->menu_player_count < 4) {
                 game->menu_player_count++;
                 game->menu_is_ai[game->menu_player_count - 1] = false;
             }
+            audio_play_sfx(AUDIO_SFX_CLICK);
         } else if (point_in_rect((float)mx, (float)my, create_btn)) {
+            audio_play_sfx(AUDIO_SFX_PLAY);
             menu_start_match(game);
         } else {
             for (int i = 0; i < game->menu_player_count; i++) {
@@ -207,10 +224,12 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 Rect ai_btn = rect_make(row.x + row.w - 80.0f, row.y + 6.0f, 70.0f, row.h - 12.0f);
                 if (point_in_rect((float)mx, (float)my, ai_btn)) {
                     game->menu_is_ai[i] = !game->menu_is_ai[i];
+                    audio_play_sfx(AUDIO_SFX_CLICK);
                     break;
                 }
                 if (point_in_rect((float)mx, (float)my, row)) {
                     game->menu_selected_name = i;
+                    audio_play_sfx(AUDIO_SFX_CLICK);
                     break;
                 }
             }

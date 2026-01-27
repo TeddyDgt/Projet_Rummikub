@@ -33,16 +33,27 @@ typedef struct {
     bool dragging;
     int drag_candidate_index;
     int drag_hand_index;
+    int drag_source;
+    int drag_candidate_table_comb;
+    int drag_candidate_table_index;
+    int drag_table_comb;
+    int drag_table_index;
     float drag_start_x;
     float drag_start_y;
     float drag_offset_x;
     float drag_offset_y;
+    float drag_w;
+    float drag_h;
     Tile drag_tile;
     bool players_initialized;
     int menu_player_count;
     char menu_player_names[4][16];
     bool menu_is_ai[4];
     int menu_selected_name;
+    char notification[128];
+    float notification_timer;
+    int notification_kind;
+    double last_time;
     GuiState state;
 } GuiGame;
 

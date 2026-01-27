@@ -2,7 +2,10 @@
 #include "gfx/renderer2d.h"
 #include "ui/gui_screen.h"
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #include <GL/gl.h>
 
 int main(void) {

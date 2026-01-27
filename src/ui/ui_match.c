@@ -3,6 +3,7 @@
 #include "platform/gui_platform.h"
 #include "gfx/renderer2d.h"
 
+#include "audio.h"
 #include "Draw.h"
 #include "Combinaisons.h"
 #include "GameLoop.h"
@@ -22,7 +23,30 @@
 typedef struct {
     Rect rect;
     int comb_index;
+    int tile_index;
 } TableTileHit;
+
+enum {
+    DRAG_SRC_NONE = 0,
+    DRAG_SRC_HAND = 1,
+    DRAG_SRC_TABLE = 2
+};
+
+enum {
+    NOTICE_INFO = 0,
+    NOTICE_WARN = 1,
+    NOTICE_ERROR = 2
+};
+
+static void ui_notify(GuiGame *game, int kind, const char *message) {
+    if (!game || !message) {
+        return;
+    }
+    strncpy(game->notification, message, sizeof(game->notification) - 1);
+    game->notification[sizeof(game->notification) - 1] = '\0';
+    game->notification_kind = kind;
+    game->notification_timer = 2.4f;
+}
 
 static int clamp_int(int value, int min, int max) {
     if (value < min) {
@@ -32,6 +56,146 @@ static int clamp_int(int value, int min, int max) {
         return max;
     }
     return value;
+}
+
+static bool can_edit_table(const GuiGame *game, const Player *p) {
+    if (!game || !p) {
+        return false;
+    }
+    return p->has_initial_meld || game->turn_points >= 30;
+}
+
+static void table_remove_tile(Table *t, int comb_idx, int tile_idx) {
+    if (!t || comb_idx < 0 || comb_idx >= t->count) {
+        return;
+    }
+    Combinaison *c = &t->table[comb_idx];
+    if (!c->tiles || tile_idx < 0 || tile_idx >= c->count) {
+        return;
+    }
+
+    for (int i = tile_idx; i < c->count - 1; i++) {
+        c->tiles[i] = c->tiles[i + 1];
+    }
+    c->count--;
+
+    if (c->count <= 0) {
+        free(c->tiles);
+        c->tiles = NULL;
+        c->count = 0;
+        c->type = 0;
+        for (int i = comb_idx; i < t->count - 1; i++) {
+            t->table[i] = t->table[i + 1];
+        }
+        t->count--;
+        return;
+    }
+}
+
+static void table_insert_tile(Table *t, int comb_idx, int insert_idx, Tile tile) {
+    if (!t || comb_idx < 0 || comb_idx >= t->count) {
+        return;
+    }
+    Combinaison *c = &t->table[comb_idx];
+    if (insert_idx < 0) {
+        insert_idx = 0;
+    }
+    if (insert_idx > c->count) {
+        insert_idx = c->count;
+    }
+
+    Tile *new_tiles = (Tile *)realloc(c->tiles, sizeof(Tile) * (size_t)(c->count + 1));
+    if (!new_tiles) {
+        return;
+    }
+    c->tiles = new_tiles;
+
+    for (int i = c->count; i > insert_idx; i--) {
+        c->tiles[i] = c->tiles[i - 1];
+    }
+    c->tiles[insert_idx] = tile;
+    c->count++;
+}
+
+static int table_add_new_comb(Table *t, Tile tile) {
+    if (!t || t->count >= MAX_COMB) {
+        return -1;
+    }
+
+    Combinaison *c = &t->table[t->count];
+    c->tiles = (Tile *)malloc(sizeof(Tile));
+    if (!c->tiles) {
+        return -1;
+    }
+    c->tiles[0] = tile;
+    c->count = 1;
+    c->type = 0;
+    t->count++;
+    return t->count - 1;
+}
+
+static void table_move_tile(Table *t, int from_comb, int from_idx, int to_comb, int to_idx) {
+    if (!t) {
+        return;
+    }
+    if (from_comb < 0 || from_comb >= t->count) {
+        return;
+    }
+    if (to_comb < 0 || to_comb >= t->count) {
+        return;
+    }
+
+    if (from_comb == to_comb) {
+        Combinaison *c = &t->table[from_comb];
+        if (!c->tiles || from_idx < 0 || from_idx >= c->count) {
+            return;
+        }
+        if (to_idx < 0) {
+            to_idx = 0;
+        }
+        if (to_idx > c->count) {
+            to_idx = c->count;
+        }
+        if (to_idx == from_idx || to_idx == from_idx + 1) {
+            return;
+        }
+
+        Tile tile = c->tiles[from_idx];
+        for (int i = from_idx; i < c->count - 1; i++) {
+            c->tiles[i] = c->tiles[i + 1];
+        }
+        c->count--;
+        if (to_idx > from_idx) {
+            to_idx--;
+        }
+
+        Tile *new_tiles = (Tile *)realloc(c->tiles, sizeof(Tile) * (size_t)(c->count + 1));
+        if (!new_tiles) {
+            return;
+        }
+        c->tiles = new_tiles;
+        for (int i = c->count; i > to_idx; i--) {
+            c->tiles[i] = c->tiles[i - 1];
+        }
+        c->tiles[to_idx] = tile;
+        c->count++;
+        return;
+    }
+
+    Combinaison *src = &t->table[from_comb];
+    if (!src->tiles || from_idx < 0 || from_idx >= src->count) {
+        return;
+    }
+    Tile tile = src->tiles[from_idx];
+    int prev_count = t->count;
+    table_remove_tile(t, from_comb, from_idx);
+    if (t->count < prev_count && from_comb < to_comb) {
+        to_comb--;
+    }
+    if (to_comb < 0 || to_comb >= t->count) {
+        return;
+    }
+    table_insert_tile(t, to_comb, to_idx, tile);
 }
 
 static void hand_move_tile(Player *p, bool *selected, int from, int to) {
@@ -95,6 +259,13 @@ static void reset_drag_state(GuiGame *game) {
     game->dragging = false;
     game->drag_candidate_index = -1;
     game->drag_hand_index = -1;
+    game->drag_source = DRAG_SRC_NONE;
+    game->drag_candidate_table_comb = -1;
+    game->drag_candidate_table_index = -1;
+    game->drag_table_comb = -1;
+    game->drag_table_index = -1;
+    game->drag_w = 0.0f;
+    game->drag_h = 0.0f;
 }
 
 static bool handle_game_over(GuiGame *game) {
@@ -352,6 +523,24 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     const float bottom_h = 180.0f;
     const float action_w = 170.0f;
 
+    double now = gui_get_time_seconds();
+    double dt = now - game->last_time;
+    if (game->last_time <= 0.0) {
+        dt = 0.0;
+    }
+    if (dt < 0.0 || dt > 1.0) {
+        dt = 0.0;
+    }
+    game->last_time = now;
+
+    if (game->notification_timer > 0.0f) {
+        game->notification_timer -= (float)dt;
+        if (game->notification_timer <= 0.0f) {
+            game->notification_timer = 0.0f;
+            game->notification[0] = '\0';
+        }
+    }
+
     Rect sidebar = rect_make(margin, margin, sidebar_w, fb_h - margin * 2.0f);
     Rect table_area = rect_make(margin + sidebar_w + margin,
                                 margin,
@@ -434,27 +623,67 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                                player_panel_y + i * (player_panel_h + player_gap),
                                sidebar.w - 20.0f,
                                player_panel_h);
-        float highlight = (i == game->current_player) ? 0.22f : 0.16f;
-        r2d_fill_rect(panel.x, panel.y, panel.w, panel.h, highlight, highlight + 0.02f, highlight + 0.03f, 1.0f);
-        r2d_stroke_rect(panel.x, panel.y, panel.w, panel.h, 0.40f, 0.40f, 0.40f, 1.0f, 2.0f);
+        float base_r = (i == game->current_player) ? 0.18f : 0.10f;
+        float base_g = (i == game->current_player) ? 0.20f : 0.12f;
+        float base_b = (i == game->current_player) ? 0.24f : 0.14f;
+        float stroke_r = (i == game->current_player) ? 0.80f : 0.55f;
+        float stroke_g = (i == game->current_player) ? 0.80f : 0.55f;
+        float stroke_b = (i == game->current_player) ? 0.65f : 0.55f;
+        r2d_fill_rect(panel.x, panel.y, panel.w, panel.h, base_r, base_g, base_b, 1.0f);
+        r2d_stroke_rect(panel.x, panel.y, panel.w, panel.h, stroke_r, stroke_g, stroke_b, 1.0f, 2.0f);
         ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
-                     0.92f, 0.92f, 0.92f, 1.0f);
+                     0.96f, 0.96f, 0.96f, 1.0f);
         char info[64];
         snprintf(info, sizeof(info), "Score: %d%s", game->players[i].score,
                  game->players[i].is_ai ? " (IA)" : "");
         ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
-                     0.85f, 0.85f, 0.85f, 1.0f);
+                     0.88f, 0.88f, 0.88f, 1.0f);
     }
 
     r2d_fill_rect(sort_panel.x, sort_panel.y, sort_panel.w, sort_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
     r2d_stroke_rect(sort_panel.x, sort_panel.y, sort_panel.w, sort_panel.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
 
-    r2d_fill_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h, 0.18f, 0.20f, 0.22f, 1.0f);
-    r2d_stroke_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h, 0.55f, 0.55f, 0.55f, 1.0f, 2.0f);
+    bool hover_sort_color = point_in_rect((float)mx, (float)my, sort_color_btn);
+    bool hover_sort_value = point_in_rect((float)mx, (float)my, sort_value_btn);
+
+    float sortc_r = 0.18f, sortc_g = 0.20f, sortc_b = 0.22f;
+    if (hover_sort_color) {
+        sortc_r += 0.06f;
+        sortc_g += 0.06f;
+        sortc_b += 0.06f;
+    }
+    if (mouse_down && hover_sort_color) {
+        sortc_r *= 0.8f;
+        sortc_g *= 0.8f;
+        sortc_b *= 0.8f;
+    }
+    r2d_fill_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h, sortc_r, sortc_g, sortc_b, 1.0f);
+    r2d_stroke_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h,
+                    hover_sort_color ? 0.75f : 0.55f,
+                    hover_sort_color ? 0.75f : 0.55f,
+                    hover_sort_color ? 0.75f : 0.55f,
+                    1.0f,
+                    2.0f);
     ui_draw_text_centered(sort_color_btn, 1.2f, "TRIER COULEUR", 0.92f, 0.92f, 0.92f, 1.0f);
 
-    r2d_fill_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h, 0.18f, 0.20f, 0.22f, 1.0f);
-    r2d_stroke_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h, 0.55f, 0.55f, 0.55f, 1.0f, 2.0f);
+    float sortv_r = 0.18f, sortv_g = 0.20f, sortv_b = 0.22f;
+    if (hover_sort_value) {
+        sortv_r += 0.06f;
+        sortv_g += 0.06f;
+        sortv_b += 0.06f;
+    }
+    if (mouse_down && hover_sort_value) {
+        sortv_r *= 0.8f;
+        sortv_g *= 0.8f;
+        sortv_b *= 0.8f;
+    }
+    r2d_fill_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h, sortv_r, sortv_g, sortv_b, 1.0f);
+    r2d_stroke_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h,
+                    hover_sort_value ? 0.75f : 0.55f,
+                    hover_sort_value ? 0.75f : 0.55f,
+                    hover_sort_value ? 0.75f : 0.55f,
+                    1.0f,
+                    2.0f);
     ui_draw_text_centered(sort_value_btn, 1.2f, "TRIER VALEUR", 0.92f, 0.92f, 0.92f, 1.0f);
 
     r2d_fill_rect(action_panel.x, action_panel.y, action_panel.w, action_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
@@ -544,6 +773,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     TableTileHit table_hits[MAX_TILES];
     int table_hit_count = 0;
     int hover_table_comb = -1;
+    int hover_table_hit = -1;
     int cell_index = 0;
     for (int ci = 0; ci < game->table.count && cell_index < total_cells; ci++) {
         Combinaison *c = &game->table.table[ci];
@@ -557,16 +787,38 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             bool hovered = point_in_rect((float)mx, (float)my, cell);
             if (hovered && hover_table_comb == -1) {
                 hover_table_comb = ci;
+                hover_table_hit = table_hit_count;
             }
 
             ui_draw_tile(cell, &c->tiles[ti], false, ci == game->active_comb_index, hovered, mouse_down && hovered);
 
             table_hits[table_hit_count].rect = cell;
             table_hits[table_hit_count].comb_index = ci;
+            table_hits[table_hit_count].tile_index = ti;
             table_hit_count++;
             cell_index++;
         }
         cell_index++;
+    }
+
+    if (game->notification_timer > 0.0f && game->notification[0]) {
+        float alpha = 1.0f;
+        if (game->notification_timer < 0.4f) {
+            alpha = game->notification_timer / 0.4f;
+        }
+        float nr = 0.18f, ng = 0.22f, nb = 0.30f;
+        if (game->notification_kind == NOTICE_WARN) {
+            nr = 0.55f; ng = 0.38f; nb = 0.18f;
+        } else if (game->notification_kind == NOTICE_ERROR) {
+            nr = 0.60f; ng = 0.18f; nb = 0.18f;
+        }
+        Rect notice = rect_make(table_area.x + 20.0f,
+                                table_area.y + 12.0f,
+                                table_area.w - 40.0f,
+                                34.0f);
+        r2d_fill_rect(notice.x, notice.y, notice.w, notice.h, nr, ng, nb, alpha);
+        r2d_stroke_rect(notice.x, notice.y, notice.w, notice.h, 0.90f, 0.90f, 0.90f, alpha, 2.0f);
+        ui_draw_text_centered(notice, 1.2f, game->notification, 0.98f, 0.98f, 0.98f, alpha);
     }
 
     Player *p = &game->players[game->current_player];
@@ -606,11 +858,25 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         }
     }
 
-    if (mouse_pressed && hover_hand_index >= 0) {
-        game->drag_pending = true;
-        game->drag_candidate_index = hover_hand_index;
-        game->drag_start_x = (float)mx;
-        game->drag_start_y = (float)my;
+    if (mouse_pressed) {
+        if (hover_hand_index >= 0) {
+            game->drag_pending = true;
+            game->drag_source = DRAG_SRC_HAND;
+            game->drag_candidate_index = hover_hand_index;
+            game->drag_start_x = (float)mx;
+            game->drag_start_y = (float)my;
+        } else if (hover_table_hit >= 0) {
+            game->drag_pending = true;
+            game->drag_source = DRAG_SRC_TABLE;
+            game->drag_candidate_table_comb = table_hits[hover_table_hit].comb_index;
+            game->drag_candidate_table_index = table_hits[hover_table_hit].tile_index;
+            game->drag_start_x = (float)mx;
+            game->drag_start_y = (float)my;
+            game->drag_offset_x = (float)mx - table_hits[hover_table_hit].rect.x;
+            game->drag_offset_y = (float)my - table_hits[hover_table_hit].rect.y;
+            game->drag_w = table_hits[hover_table_hit].rect.w;
+            game->drag_h = table_hits[hover_table_hit].rect.h;
+        }
     }
 
     if (game->drag_pending && mouse_down && !game->dragging) {
@@ -619,15 +885,31 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         if (dx * dx + dy * dy > 36.0f) {
             game->dragging = true;
             game->drag_pending = false;
-            game->drag_hand_index = game->drag_candidate_index;
-            game->drag_tile = p->hand[game->drag_hand_index];
-            game->drag_offset_x = (float)mx - hand_rects[game->drag_hand_index].x;
-            game->drag_offset_y = (float)my - hand_rects[game->drag_hand_index].y;
+            if (game->drag_source == DRAG_SRC_HAND) {
+                game->drag_hand_index = game->drag_candidate_index;
+                if (game->drag_hand_index >= 0 && game->drag_hand_index < p->hand_count) {
+                    game->drag_tile = p->hand[game->drag_hand_index];
+                    game->drag_offset_x = (float)mx - hand_rects[game->drag_hand_index].x;
+                    game->drag_offset_y = (float)my - hand_rects[game->drag_hand_index].y;
+                    game->drag_w = tile_w;
+                    game->drag_h = tile_h;
+                }
+            } else if (game->drag_source == DRAG_SRC_TABLE) {
+                game->drag_table_comb = game->drag_candidate_table_comb;
+                game->drag_table_index = game->drag_candidate_table_index;
+                if (game->drag_table_comb >= 0 && game->drag_table_comb < game->table.count) {
+                    Combinaison *c = &game->table.table[game->drag_table_comb];
+                    if (c->tiles && game->drag_table_index >= 0 && game->drag_table_index < c->count) {
+                        game->drag_tile = c->tiles[game->drag_table_index];
+                    }
+                }
+            }
         }
     }
 
+    bool hand_dragging = game->dragging && game->drag_source == DRAG_SRC_HAND;
     int drag_target = -1;
-    if (game->dragging) {
+    if (hand_dragging) {
         if (hover_hand_index >= 0) {
             drag_target = hover_hand_index;
         } else if (point_in_rect((float)mx, (float)my, rack_area)) {
@@ -639,7 +921,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     int slot_to_tile[MAX_TILES];
     int tile_count = p->hand_count;
-    if (!game->dragging || tile_count <= 0) {
+    if (!hand_dragging || tile_count <= 0) {
         for (int i = 0; i < tile_count; i++) {
             slot_to_tile[i] = i;
         }
@@ -668,9 +950,9 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             continue;
         }
 
-        bool hovered = !game->dragging && hover_hand_index == tile_index;
+        bool hovered = (!hand_dragging) && hover_hand_index == tile_index;
         bool pressed = mouse_down && hovered;
-        if (game->drag_pending && tile_index == game->drag_candidate_index) {
+        if (game->drag_pending && game->drag_source == DRAG_SRC_HAND && tile_index == game->drag_candidate_index) {
             pressed = true;
         }
         ui_draw_tile(slot, &p->hand[tile_index], game->selected[tile_index], false, hovered, pressed);
@@ -679,8 +961,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     if (game->dragging) {
         Rect drag_rect = rect_make((float)mx - game->drag_offset_x,
                                    (float)my - game->drag_offset_y,
-                                   tile_w,
-                                   tile_h);
+                                   game->drag_w,
+                                   game->drag_h);
         ui_draw_tile(drag_rect, &game->drag_tile, false, false, true, true);
     }
 
@@ -692,42 +974,150 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     if (mouse_released) {
         if (game->dragging) {
-            int drop_comb = -1;
-            if (hover_table_comb >= 0) {
-                drop_comb = hover_table_comb;
-            } else if (game->active_comb_index >= 0 && point_in_rect((float)mx, (float)my, table_area)) {
-                drop_comb = game->active_comb_index;
-            }
-
-            if (drop_comb >= 0) {
-                Tile t = game->drag_tile;
-                if (!p->has_initial_meld && game->turn_points < 30) {
-                    printf("[UI] Premiere pose: au moins 30 points requis.\n");
-                } else if (add_tile_to_table_comb(&game->table, drop_comb, t)) {
-                    remove_tile_from_hand(p, t.id);
-                    game->active_comb_index = drop_comb;
-                    ui_clear_selection(game->selected, MAX_TILES);
-                    game->last_hand_count = p->hand_count;
-                    game->turn_played = true;
-                } else {
-                    printf("[UI] Ajout impossible : combinaison invalide.\n");
+            if (game->drag_source == DRAG_SRC_HAND) {
+                int drop_comb = -1;
+                if (hover_table_comb >= 0) {
+                    drop_comb = hover_table_comb;
+                } else if (game->active_comb_index >= 0 && point_in_rect((float)mx, (float)my, table_area)) {
+                    drop_comb = game->active_comb_index;
                 }
-            } else if (point_in_rect((float)mx, (float)my, rack_area)) {
-                int drop_index = drag_target >= 0 ? drag_target : game->drag_hand_index;
-                hand_move_tile(p, game->selected, game->drag_hand_index, drop_index);
+
+                if (drop_comb >= 0) {
+                    Tile t = game->drag_tile;
+                    if (!can_edit_table(game, p)) {
+                        ui_notify(game, NOTICE_ERROR, "Premiere pose: 30 points requis.");
+                        audio_play_sfx(AUDIO_SFX_INVALID);
+                    } else {
+                        int insert_idx = game->table.table[drop_comb].count;
+                        if (hover_table_hit >= 0 && table_hits[hover_table_hit].comb_index == drop_comb) {
+                            Rect hrect = table_hits[hover_table_hit].rect;
+                            int base = table_hits[hover_table_hit].tile_index;
+                            if ((float)mx > hrect.x + hrect.w * 0.5f) {
+                                base++;
+                            }
+                            insert_idx = base;
+                        }
+                        int before_count = game->table.table[drop_comb].count;
+                        table_insert_tile(&game->table, drop_comb, insert_idx, t);
+                        if (game->table.table[drop_comb].count == before_count) {
+                            ui_notify(game, NOTICE_ERROR, "Ajout impossible : memoire insuffisante.");
+                            audio_play_sfx(AUDIO_SFX_INVALID);
+                        } else {
+                            remove_tile_from_hand(p, t.id);
+                            game->active_comb_index = drop_comb;
+                            ui_clear_selection(game->selected, MAX_TILES);
+                            game->last_hand_count = p->hand_count;
+                            game->turn_played = true;
+                            if (!is_valid_combination(&game->table.table[drop_comb])) {
+                                ui_notify(game, NOTICE_WARN, "Combinaison invalide: corrigez avant de valider.");
+                                audio_play_sfx(AUDIO_SFX_INVALID);
+                            } else {
+                                audio_play_sfx(AUDIO_SFX_PLAY);
+                            }
+                        }
+                    }
+                } else if (point_in_rect((float)mx, (float)my, rack_area)) {
+                    int drop_index = drag_target >= 0 ? drag_target : game->drag_hand_index;
+                    hand_move_tile(p, game->selected, game->drag_hand_index, drop_index);
+                }
+            } else if (game->drag_source == DRAG_SRC_TABLE) {
+                if (!can_edit_table(game, p)) {
+                    ui_notify(game, NOTICE_ERROR, "Premiere pose: 30 points requis.");
+                    audio_play_sfx(AUDIO_SFX_INVALID);
+                } else {
+                    int target_comb = -1;
+                    int insert_idx = -1;
+
+                    if (hover_table_comb >= 0) {
+                        target_comb = hover_table_comb;
+                        insert_idx = game->table.table[target_comb].count;
+                        if (hover_table_hit >= 0 && table_hits[hover_table_hit].comb_index == target_comb) {
+                            Rect hrect = table_hits[hover_table_hit].rect;
+                            int base = table_hits[hover_table_hit].tile_index;
+                            if ((float)mx > hrect.x + hrect.w * 0.5f) {
+                                base++;
+                            }
+                            insert_idx = base;
+                        }
+                    } else if (point_in_rect((float)mx, (float)my, table_area)) {
+                        if (game->table.count < MAX_COMB) {
+                            int origin_comb = game->drag_table_comb;
+                            int origin_idx = game->drag_table_index;
+                            Tile t = game->drag_tile;
+                            int prev_count = game->table.count;
+                            table_remove_tile(&game->table, origin_comb, origin_idx);
+                            int new_idx = table_add_new_comb(&game->table, t);
+                            if (new_idx >= 0) {
+                                game->active_comb_index = new_idx;
+                                game->turn_played = true;
+                                ui_notify(game, NOTICE_WARN, "Nouvelle combinaison a completer.");
+                                audio_play_sfx(AUDIO_SFX_PLAY);
+                            } else {
+                                if (game->table.count < prev_count) {
+                                    if (origin_comb > game->table.count) {
+                                        origin_comb = game->table.count;
+                                    }
+                                }
+                                if (origin_comb >= 0 && origin_comb < game->table.count) {
+                                    table_insert_tile(&game->table, origin_comb, origin_idx, t);
+                                } else {
+                                    table_add_new_comb(&game->table, t);
+                                }
+                            }
+                        } else {
+                            ui_notify(game, NOTICE_ERROR, "Limite de combinaisons atteinte.");
+                            audio_play_sfx(AUDIO_SFX_INVALID);
+                        }
+                    } else if (point_in_rect((float)mx, (float)my, rack_area)) {
+                        ui_notify(game, NOTICE_WARN, "Impossible de reprendre une tuile sur le support.");
+                        audio_play_sfx(AUDIO_SFX_INVALID);
+                    }
+
+                    if (target_comb >= 0) {
+                        bool same_slot = (target_comb == game->drag_table_comb) &&
+                                         (insert_idx == game->drag_table_index ||
+                                          insert_idx == game->drag_table_index + 1);
+                        if (!same_slot) {
+                            int final_target = target_comb;
+                            if (game->drag_table_comb >= 0 &&
+                                game->drag_table_comb < game->table.count &&
+                                game->table.table[game->drag_table_comb].count == 1 &&
+                                game->drag_table_comb < target_comb) {
+                                final_target--;
+                            }
+                            table_move_tile(&game->table,
+                                            game->drag_table_comb,
+                                            game->drag_table_index,
+                                            target_comb,
+                                            insert_idx);
+                            game->active_comb_index = final_target;
+                            game->turn_played = true;
+                            if (!is_valid_combination(&game->table.table[final_target])) {
+                                ui_notify(game, NOTICE_WARN, "Combinaison invalide: corrigez avant de valider.");
+                                audio_play_sfx(AUDIO_SFX_INVALID);
+                            } else {
+                                audio_play_sfx(AUDIO_SFX_PLAY);
+                            }
+                        } else {
+                            game->active_comb_index = target_comb;
+                        }
+                    }
+                }
             }
 
-            game->dragging = false;
-            game->drag_pending = false;
-            game->drag_candidate_index = -1;
-            game->drag_hand_index = -1;
+            reset_drag_state(game);
         } else if (game->drag_pending) {
-            int idx = game->drag_candidate_index;
-            if (idx >= 0 && idx < p->hand_count) {
-                game->selected[idx] = !game->selected[idx];
+            if (game->drag_source == DRAG_SRC_HAND) {
+                int idx = game->drag_candidate_index;
+                if (idx >= 0 && idx < p->hand_count) {
+                    game->selected[idx] = !game->selected[idx];
+                }
+            } else if (game->drag_source == DRAG_SRC_TABLE) {
+                if (game->drag_candidate_table_comb >= 0 && game->drag_candidate_table_comb < game->table.count) {
+                    game->active_comb_index = game->drag_candidate_table_comb;
+                }
             }
-            game->drag_pending = false;
-            game->drag_candidate_index = -1;
+            reset_drag_state(game);
         }
     }
 
@@ -735,6 +1125,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     if (mouse_pressed && !input_blocked) {
         if (point_in_rect((float)mx, (float)my, menu_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
             game->state = GUI_STATE_MENU;
             game->menu_selected_name = 0;
             ui_input_reset(game);
@@ -742,12 +1133,14 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         }
 
         if (point_in_rect((float)mx, (float)my, sort_color_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
             sort_player_hand(p, 1);
             ui_clear_selection(game->selected, MAX_TILES);
             if (!game->turn_played) {
                 backup_hand(game, p);
             }
         } else if (point_in_rect((float)mx, (float)my, sort_value_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
             sort_player_hand(p, 0);
             ui_clear_selection(game->selected, MAX_TILES);
             if (!game->turn_played) {
@@ -755,16 +1148,19 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             }
         } else if (point_in_rect((float)mx, (float)my, draw_btn)) {
             if (game->turn_played) {
-                printf("[UI] Pioche impossible apres avoir joue.\n");
+                ui_notify(game, NOTICE_WARN, "Pioche impossible apres avoir joue.");
+                audio_play_sfx(AUDIO_SFX_INVALID);
             } else {
                 if (game->deck.top > 0) {
                     add_tile_to_player(p, draw_tile(&game->deck));
+                    audio_play_sfx(AUDIO_SFX_DRAW);
                 }
                 end_turn(game);
                 game->prev_mouse_down = mouse_down;
                 return;
             }
         } else if (point_in_rect((float)mx, (float)my, play_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
             int sel_idx[MAX_TILES];
             int sel_count = 0;
             for (int i = 0; i < p->hand_count; i++) {
@@ -798,34 +1194,42 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                     if (!p->has_initial_meld) {
                         game->turn_points += points;
                     }
+                    audio_play_sfx(AUDIO_SFX_PLAY);
                 } else {
-                    printf("[UI] Combinaison invalide (>=3 requis).\n");
+                    ui_notify(game, NOTICE_ERROR, "Combinaison invalide (>=3 requis).");
+                    audio_play_sfx(AUDIO_SFX_INVALID);
                 }
                 free(comb.tiles);
                 ui_clear_selection(game->selected, MAX_TILES);
             } else if (sel_count == 1) {
                 if (!p->has_initial_meld && game->turn_points < 30) {
-                    printf("[UI] Premiere pose: au moins 30 points requis.\n");
+                    ui_notify(game, NOTICE_ERROR, "Premiere pose: 30 points requis.");
+                    audio_play_sfx(AUDIO_SFX_INVALID);
                 } else if (game->active_comb_index >= 0) {
                     Tile t = p->hand[sel_idx[0]];
                     if (add_tile_to_table_comb(&game->table, game->active_comb_index, t)) {
                         remove_tile_from_hand(p, t.id);
                         game->last_hand_count = p->hand_count;
                         game->turn_played = true;
+                        audio_play_sfx(AUDIO_SFX_PLAY);
                     } else {
-                        printf("[UI] Ajout impossible : combinaison invalide.\n");
+                        ui_notify(game, NOTICE_WARN, "Ajout impossible : combinaison invalide.");
+                        audio_play_sfx(AUDIO_SFX_INVALID);
                     }
                 } else {
-                    printf("[UI] Aucun groupe actif a completer.\n");
+                    ui_notify(game, NOTICE_WARN, "Aucun groupe actif a completer.");
+                    audio_play_sfx(AUDIO_SFX_INVALID);
                 }
                 ui_clear_selection(game->selected, MAX_TILES);
             } else {
-                printf("[UI] Selection vide ou trop courte.\n");
+                ui_notify(game, NOTICE_WARN, "Selection vide ou trop courte.");
+                audio_play_sfx(AUDIO_SFX_INVALID);
             }
         } else if (point_in_rect((float)mx, (float)my, validate_btn)) {
             if (!game->turn_played) {
                 if (game->deck.top > 0) {
                     add_tile_to_player(p, draw_tile(&game->deck));
+                    audio_play_sfx(AUDIO_SFX_DRAW);
                 }
                 end_turn(game);
                 game->prev_mouse_down = mouse_down;
@@ -833,7 +1237,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             }
 
             if (!p->has_initial_meld && game->turn_points < 30) {
-                printf("[UI] Premiere pose: 30 points minimum, pioche et tour suivant.\n");
+                ui_notify(game, NOTICE_ERROR, "Premiere pose: 30 points minimum.");
+                audio_play_sfx(AUDIO_SFX_INVALID);
                 free_table(&game->table);
                 game->table = clone_table(&game->table_backup);
                 restore_hand(game, p);
@@ -844,6 +1249,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 game->last_hand_count = p->hand_count;
                 if (game->deck.top > 0) {
                     add_tile_to_player(p, draw_tile(&game->deck));
+                    audio_play_sfx(AUDIO_SFX_DRAW);
                 }
                 end_turn(game);
                 game->prev_mouse_down = mouse_down;
@@ -851,7 +1257,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             }
 
             if (!verify_whole_table(&game->table)) {
-                printf("[UI] Table invalide, retour a l'etat precedent.\n");
+                ui_notify(game, NOTICE_ERROR, "Table invalide, retour a l'etat precedent.");
+                audio_play_sfx(AUDIO_SFX_INVALID);
                 free_table(&game->table);
                 game->table = clone_table(&game->table_backup);
                 restore_hand(game, p);
@@ -864,20 +1271,18 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 if (!p->has_initial_meld && game->turn_points >= 30) {
                     p->has_initial_meld = 1;
                 }
+                audio_play_sfx(AUDIO_SFX_VALIDATE);
                 end_turn(game);
                 game->prev_mouse_down = mouse_down;
                 return;
             }
         } else {
-            int hit = 0;
             for (int i = 0; i < table_hit_count; i++) {
                 if (point_in_rect((float)mx, (float)my, table_hits[i].rect)) {
                     game->active_comb_index = table_hits[i].comb_index;
-                    hit = 1;
                     break;
                 }
             }
-
         }
     }
 
