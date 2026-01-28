@@ -13,6 +13,8 @@ THIRD_PARTY = ../third_party
 GLFW_DIR = $(THIRD_PARTY)/glfw
 GLFW_BUILD = $(GLFW_DIR)/build
 GLFW_LIB = $(GLFW_BUILD)/src/libglfw3.a
+GLFW_DLL = ../glfw3.dll
+GLFW_IMP = $(GLFW_DIR)/lib-mingw/libglfw3dll.a
 GLFW_LIB_DEP =
 CMAKE ?= cmake
 GLFW_CMAKE_GEN ?=
@@ -22,7 +24,16 @@ CFLAGS += -Igraphics -I$(THIRD_PARTY)/miniaudio
 ifeq ($(OS),Windows_NT)
 GUI_EXEC = rummikub_gui.exe
 GLFW_CMAKE_GEN ?= MinGW Makefiles
-ifneq ($(wildcard $(GLFW_DIR)/CMakeLists.txt),)
+ifneq ($(wildcard $(GLFW_DLL)),)
+ifneq ($(wildcard $(GLFW_IMP)),)
+CFLAGS += -I$(GLFW_DIR)/include
+CFLAGS += -DGLFW_DLL
+PLATFORM_LIBS = -L$(GLFW_DIR)/lib-mingw -lglfw3dll -lopengl32 -lgdi32 -luser32 -lkernel32 -lwinmm
+GLFW_LIB_DEP = $(GLFW_IMP)
+else
+$(error libglfw3dll.a manquant: place-le dans third_party/glfw/lib-mingw/)
+endif
+else ifneq ($(wildcard $(GLFW_DIR)/CMakeLists.txt),)
 USE_BUNDLED_GLFW = 1
 CFLAGS += -I$(GLFW_DIR)/include
 GLFW_CMAKE_FLAGS += -DGLFW_BUILD_SHARED_LIBS=OFF

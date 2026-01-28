@@ -12,7 +12,6 @@
 
 #include "ui_input.h"
 #include "ui_rect.h"
-#include "ui_text.h"
 #include "ui_tiles.h"
 #include "ui_util.h"
 
@@ -541,52 +540,53 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         }
     }
 
-    Rect sidebar = rect_make(margin, margin, sidebar_w, fb_h - margin * 2.0f);
-    Rect table_area = rect_make(margin + sidebar_w + margin,
-                                margin,
-                                fb_w - sidebar_w - margin * 3.0f,
-                                fb_h - bottom_h - margin * 2.0f);
-    Rect bottom_area = rect_make(margin,
-                                 fb_h - bottom_h - margin,
-                                 fb_w - margin * 2.0f,
-                                 bottom_h);
+    MatchLayout layout = {0};
+    layout.sidebar = rect_make(margin, margin, sidebar_w, fb_h - margin * 2.0f);
+    layout.table_area = rect_make(margin + sidebar_w + margin,
+                                  margin,
+                                  fb_w - sidebar_w - margin * 3.0f,
+                                  fb_h - bottom_h - margin * 2.0f);
+    layout.bottom_area = rect_make(margin,
+                                   fb_h - bottom_h - margin,
+                                   fb_w - margin * 2.0f,
+                                   bottom_h);
 
-    Rect menu_btn = rect_make(sidebar.x, sidebar.y, sidebar.w, 36.0f);
+    layout.menu_btn = rect_make(layout.sidebar.x, layout.sidebar.y, layout.sidebar.w, 36.0f);
 
-    Rect sort_panel = rect_make(bottom_area.x,
-                                bottom_area.y + 10.0f,
-                                sidebar_w,
-                                bottom_area.h - 20.0f);
-    Rect sort_color_btn = rect_make(sort_panel.x + 10.0f,
-                                    sort_panel.y + 12.0f,
-                                    sort_panel.w - 20.0f,
+    layout.sort_panel = rect_make(layout.bottom_area.x,
+                                  layout.bottom_area.y + 10.0f,
+                                  sidebar_w,
+                                  layout.bottom_area.h - 20.0f);
+    layout.sort_color_btn = rect_make(layout.sort_panel.x + 10.0f,
+                                      layout.sort_panel.y + 12.0f,
+                                      layout.sort_panel.w - 20.0f,
+                                      40.0f);
+    layout.sort_value_btn = rect_make(layout.sort_panel.x + 10.0f,
+                                      layout.sort_panel.y + 62.0f,
+                                      layout.sort_panel.w - 20.0f,
+                                      40.0f);
+
+    layout.action_panel = rect_make(layout.bottom_area.x + layout.bottom_area.w - action_w,
+                                    layout.bottom_area.y + 10.0f,
+                                    action_w - 10.0f,
+                                    layout.bottom_area.h - 20.0f);
+    layout.play_btn = rect_make(layout.action_panel.x + 10.0f,
+                                layout.action_panel.y + 10.0f,
+                                layout.action_panel.w - 20.0f,
+                                40.0f);
+    layout.validate_btn = rect_make(layout.action_panel.x + 10.0f,
+                                    layout.action_panel.y + 58.0f,
+                                    layout.action_panel.w - 20.0f,
                                     40.0f);
-    Rect sort_value_btn = rect_make(sort_panel.x + 10.0f,
-                                    sort_panel.y + 62.0f,
-                                    sort_panel.w - 20.0f,
-                                    40.0f);
+    layout.draw_btn = rect_make(layout.action_panel.x + 10.0f,
+                                layout.action_panel.y + 106.0f,
+                                layout.action_panel.w - 20.0f,
+                                40.0f);
 
-    Rect action_panel = rect_make(bottom_area.x + bottom_area.w - action_w,
-                                  bottom_area.y + 10.0f,
-                                  action_w - 10.0f,
-                                  bottom_area.h - 20.0f);
-    Rect play_btn = rect_make(action_panel.x + 10.0f,
-                              action_panel.y + 10.0f,
-                              action_panel.w - 20.0f,
-                              40.0f);
-    Rect validate_btn = rect_make(action_panel.x + 10.0f,
-                                  action_panel.y + 58.0f,
-                                  action_panel.w - 20.0f,
-                                  40.0f);
-    Rect draw_btn = rect_make(action_panel.x + 10.0f,
-                              action_panel.y + 106.0f,
-                              action_panel.w - 20.0f,
-                              40.0f);
-
-    Rect rack_area = rect_make(bottom_area.x + sidebar_w + margin,
-                               bottom_area.y + 10.0f,
-                               bottom_area.w - sidebar_w - action_w - margin * 2.0f,
-                               bottom_area.h - 20.0f);
+    layout.rack_area = rect_make(layout.bottom_area.x + sidebar_w + margin,
+                                 layout.bottom_area.y + 10.0f,
+                                 layout.bottom_area.w - sidebar_w - action_w - margin * 2.0f,
+                                 layout.bottom_area.h - 20.0f);
 
     double mx = 0.0, my = 0.0;
     gui_get_mouse_pos(w, &mx, &my);
@@ -602,174 +602,39 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         }
     }
 
-    r2d_fill_rect(sidebar.x, sidebar.y, sidebar.w, sidebar.h, 0.11f, 0.12f, 0.13f, 1.0f);
-    r2d_stroke_rect(sidebar.x, sidebar.y, sidebar.w, sidebar.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
+    draw_match_background(&layout);
+    draw_menu_button(&layout.menu_btn);
+    draw_player_list(&layout, game);
 
-    r2d_fill_rect(table_area.x, table_area.y, table_area.w, table_area.h, 0.16f, 0.18f, 0.20f, 1.0f);
-    r2d_stroke_rect(table_area.x, table_area.y, table_area.w, table_area.h, 0.35f, 0.36f, 0.38f, 1.0f, 2.0f);
+    bool hover_sort_color = point_in_rect((float)mx, (float)my, layout.sort_color_btn);
+    bool hover_sort_value = point_in_rect((float)mx, (float)my, layout.sort_value_btn);
+    draw_sort_buttons(&layout, hover_sort_color, hover_sort_value, mouse_down);
 
-    r2d_fill_rect(bottom_area.x, bottom_area.y, bottom_area.w, bottom_area.h, 0.10f, 0.11f, 0.12f, 1.0f);
-    r2d_stroke_rect(bottom_area.x, bottom_area.y, bottom_area.w, bottom_area.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
-
-    r2d_fill_rect(menu_btn.x, menu_btn.y, menu_btn.w, menu_btn.h, 0.20f, 0.21f, 0.22f, 1.0f);
-    r2d_stroke_rect(menu_btn.x, menu_btn.y, menu_btn.w, menu_btn.h, 0.45f, 0.45f, 0.45f, 1.0f, 2.0f);
-    ui_draw_text_centered(menu_btn, 1.6f, "MENU", 0.90f, 0.90f, 0.90f, 1.0f);
-
-    float player_panel_y = menu_btn.y + menu_btn.h + 20.0f;
-    float player_panel_h = 78.0f;
-    float player_gap = 18.0f;
-    for (int i = 0; i < game->num_players; i++) {
-        Rect panel = rect_make(sidebar.x + 10.0f,
-                               player_panel_y + i * (player_panel_h + player_gap),
-                               sidebar.w - 20.0f,
-                               player_panel_h);
-        float base_r = (i == game->current_player) ? 0.18f : 0.10f;
-        float base_g = (i == game->current_player) ? 0.20f : 0.12f;
-        float base_b = (i == game->current_player) ? 0.24f : 0.14f;
-        float stroke_r = (i == game->current_player) ? 0.80f : 0.55f;
-        float stroke_g = (i == game->current_player) ? 0.80f : 0.55f;
-        float stroke_b = (i == game->current_player) ? 0.65f : 0.55f;
-        r2d_fill_rect(panel.x, panel.y, panel.w, panel.h, base_r, base_g, base_b, 1.0f);
-        r2d_stroke_rect(panel.x, panel.y, panel.w, panel.h, stroke_r, stroke_g, stroke_b, 1.0f, 2.0f);
-        ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
-                     0.96f, 0.96f, 0.96f, 1.0f);
-        char info[64];
-        int display_score = -calculate_hand_penalty(&game->players[i]);
-        snprintf(info, sizeof(info), "Score: %d%s", display_score,
-                 game->players[i].is_ai ? " (IA)" : "");
-        ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
-                     0.88f, 0.88f, 0.88f, 1.0f);
-    }
-
-    r2d_fill_rect(sort_panel.x, sort_panel.y, sort_panel.w, sort_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
-    r2d_stroke_rect(sort_panel.x, sort_panel.y, sort_panel.w, sort_panel.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
-
-    bool hover_sort_color = point_in_rect((float)mx, (float)my, sort_color_btn);
-    bool hover_sort_value = point_in_rect((float)mx, (float)my, sort_value_btn);
-
-    float sortc_r = 0.18f, sortc_g = 0.20f, sortc_b = 0.22f;
-    if (hover_sort_color) {
-        sortc_r += 0.06f;
-        sortc_g += 0.06f;
-        sortc_b += 0.06f;
-    }
-    if (mouse_down && hover_sort_color) {
-        sortc_r *= 0.8f;
-        sortc_g *= 0.8f;
-        sortc_b *= 0.8f;
-    }
-    r2d_fill_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h, sortc_r, sortc_g, sortc_b, 1.0f);
-    r2d_stroke_rect(sort_color_btn.x, sort_color_btn.y, sort_color_btn.w, sort_color_btn.h,
-                    hover_sort_color ? 0.75f : 0.55f,
-                    hover_sort_color ? 0.75f : 0.55f,
-                    hover_sort_color ? 0.75f : 0.55f,
-                    1.0f,
-                    2.0f);
-    ui_draw_text_centered(sort_color_btn, 1.2f, "TRIER COULEUR", 0.92f, 0.92f, 0.92f, 1.0f);
-
-    float sortv_r = 0.18f, sortv_g = 0.20f, sortv_b = 0.22f;
-    if (hover_sort_value) {
-        sortv_r += 0.06f;
-        sortv_g += 0.06f;
-        sortv_b += 0.06f;
-    }
-    if (mouse_down && hover_sort_value) {
-        sortv_r *= 0.8f;
-        sortv_g *= 0.8f;
-        sortv_b *= 0.8f;
-    }
-    r2d_fill_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h, sortv_r, sortv_g, sortv_b, 1.0f);
-    r2d_stroke_rect(sort_value_btn.x, sort_value_btn.y, sort_value_btn.w, sort_value_btn.h,
-                    hover_sort_value ? 0.75f : 0.55f,
-                    hover_sort_value ? 0.75f : 0.55f,
-                    hover_sort_value ? 0.75f : 0.55f,
-                    1.0f,
-                    2.0f);
-    ui_draw_text_centered(sort_value_btn, 1.2f, "TRIER VALEUR", 0.92f, 0.92f, 0.92f, 1.0f);
-
-    r2d_fill_rect(action_panel.x, action_panel.y, action_panel.w, action_panel.h, 0.12f, 0.12f, 0.13f, 1.0f);
-    r2d_stroke_rect(action_panel.x, action_panel.y, action_panel.w, action_panel.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
-
-    bool hover_play = point_in_rect((float)mx, (float)my, play_btn);
-    bool hover_validate = point_in_rect((float)mx, (float)my, validate_btn);
-    bool hover_draw = point_in_rect((float)mx, (float)my, draw_btn);
-
-    float play_r = 0.20f, play_g = 0.30f, play_b = 0.20f;
-    if (hover_play) {
-        play_r += 0.05f;
-        play_g += 0.05f;
-        play_b += 0.05f;
-    }
-    if (mouse_down && hover_play) {
-        play_r *= 0.8f;
-        play_g *= 0.8f;
-        play_b *= 0.8f;
-    }
-    r2d_fill_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, play_r, play_g, play_b, 1.0f);
-    r2d_stroke_rect(play_btn.x, play_btn.y, play_btn.w, play_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
-    ui_draw_text_centered(play_btn, 1.4f, "JOUER", 0.95f, 0.95f, 0.95f, 1.0f);
-
-    float val_r = 0.20f, val_g = 0.22f, val_b = 0.30f;
-    if (hover_validate) {
-        val_r += 0.05f;
-        val_g += 0.05f;
-        val_b += 0.05f;
-    }
-    if (mouse_down && hover_validate) {
-        val_r *= 0.8f;
-        val_g *= 0.8f;
-        val_b *= 0.8f;
-    }
-    r2d_fill_rect(validate_btn.x, validate_btn.y, validate_btn.w, validate_btn.h, val_r, val_g, val_b, 1.0f);
-    r2d_stroke_rect(validate_btn.x, validate_btn.y, validate_btn.w, validate_btn.h, 0.60f, 0.70f, 0.90f, 1.0f, 2.0f);
-    ui_draw_text_centered(validate_btn, 1.4f, "VALIDER", 0.95f, 0.95f, 0.95f, 1.0f);
-
-    float draw_r = 0.22f, draw_g = 0.20f, draw_b = 0.18f;
-    if (hover_draw) {
-        draw_r += 0.05f;
-        draw_g += 0.05f;
-        draw_b += 0.05f;
-    }
-    if (mouse_down && hover_draw) {
-        draw_r *= 0.8f;
-        draw_g *= 0.8f;
-        draw_b *= 0.8f;
-    }
-    r2d_fill_rect(draw_btn.x, draw_btn.y, draw_btn.w, draw_btn.h, draw_r, draw_g, draw_b, 1.0f);
-    r2d_stroke_rect(draw_btn.x, draw_btn.y, draw_btn.w, draw_btn.h, 0.70f, 0.60f, 0.50f, 1.0f, 2.0f);
-    ui_draw_text_centered(draw_btn, 1.2f, "PIOCHER", 0.95f, 0.95f, 0.95f, 1.0f);
+    bool hover_play = point_in_rect((float)mx, (float)my, layout.play_btn);
+    bool hover_validate = point_in_rect((float)mx, (float)my, layout.validate_btn);
+    bool hover_draw = point_in_rect((float)mx, (float)my, layout.draw_btn);
+    draw_action_buttons(&layout, hover_play, hover_validate, hover_draw, mouse_down);
 
     int grid_cols = 20;
     int grid_rows = 8;
     float grid_pad = 8.0f;
 
-    float cell_w = (table_area.w - grid_pad * (grid_cols + 1)) / (float)grid_cols;
+    float cell_w = (layout.table_area.w - grid_pad * (grid_cols + 1)) / (float)grid_cols;
     float cell_h = cell_w * 1.35f;
     float grid_h = grid_rows * cell_h + (grid_rows + 1) * grid_pad;
-    if (grid_h > table_area.h) {
-        cell_h = (table_area.h - grid_pad * (grid_rows + 1)) / (float)grid_rows;
+    if (grid_h > layout.table_area.h) {
+        cell_h = (layout.table_area.h - grid_pad * (grid_rows + 1)) / (float)grid_rows;
         cell_w = cell_h / 1.35f;
     }
 
     float grid_w = grid_cols * cell_w + (grid_cols + 1) * grid_pad;
     grid_h = grid_rows * cell_h + (grid_rows + 1) * grid_pad;
 
-    float grid_x = table_area.x + (table_area.w - grid_w) * 0.5f;
-    float grid_y = table_area.y + (table_area.h - grid_h) * 0.5f;
+    float grid_x = layout.table_area.x + (layout.table_area.w - grid_w) * 0.5f;
+    float grid_y = layout.table_area.y + (layout.table_area.h - grid_h) * 0.5f;
 
     int total_cells = grid_cols * grid_rows;
-    for (int i = 0; i < total_cells; i++) {
-        int row = i / grid_cols;
-        int col = i % grid_cols;
-        float x = grid_x + grid_pad + col * (cell_w + grid_pad);
-        float y = grid_y + grid_pad + row * (cell_h + grid_pad);
-        Rect cell = rect_make(x, y, cell_w, cell_h);
-
-        if (i == 0) {
-            r2d_fill_rect(cell.x, cell.y, cell.w, cell.h, 0.12f, 0.16f, 0.18f, 1.0f);
-        }
-        r2d_stroke_rect(cell.x, cell.y, cell.w, cell.h, 0.30f, 0.30f, 0.30f, 1.0f, 1.5f);
-    }
+    draw_table_grid(&layout.table_area, grid_cols, grid_rows, grid_pad, cell_w, cell_h, grid_x, grid_y, total_cells);
 
     TableTileHit table_hits[MAX_TILES];
     int table_hit_count = 0;
@@ -802,40 +667,23 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         cell_index++;
     }
 
-    if (game->notification_timer > 0.0f && game->notification[0]) {
-        float alpha = 1.0f;
-        if (game->notification_timer < 0.4f) {
-            alpha = game->notification_timer / 0.4f;
-        }
-        float nr = 0.18f, ng = 0.22f, nb = 0.30f;
-        if (game->notification_kind == NOTICE_WARN) {
-            nr = 0.55f; ng = 0.38f; nb = 0.18f;
-        } else if (game->notification_kind == NOTICE_ERROR) {
-            nr = 0.60f; ng = 0.18f; nb = 0.18f;
-        }
-        Rect notice = rect_make(table_area.x + 20.0f,
-                                table_area.y + 12.0f,
-                                table_area.w - 40.0f,
-                                34.0f);
-        r2d_fill_rect(notice.x, notice.y, notice.w, notice.h, nr, ng, nb, alpha);
-        r2d_stroke_rect(notice.x, notice.y, notice.w, notice.h, 0.90f, 0.90f, 0.90f, alpha, 2.0f);
-        ui_draw_text_centered(notice, 1.2f, game->notification, 0.98f, 0.98f, 0.98f, alpha);
-    }
+    draw_notification(&layout.table_area, game);
 
     Player *p = &game->players[game->current_player];
 
     int rack_slots = p->hand_count > 14 ? p->hand_count : 14;
     float rack_pad = 8.0f;
-    float tile_h = rack_area.h - 16.0f;
+    float tile_h = layout.rack_area.h - 16.0f;
     float tile_w = tile_h * 0.72f;
     float rack_needed = rack_slots * tile_w + (rack_slots - 1) * rack_pad;
-    if (rack_needed > rack_area.w) {
-        tile_w = (rack_area.w - (rack_slots - 1) * rack_pad) / (float)rack_slots;
+    if (rack_needed > layout.rack_area.w) {
+        tile_w = (layout.rack_area.w - (rack_slots - 1) * rack_pad) / (float)rack_slots;
         tile_h = tile_w / 0.72f;
     }
 
-    float rack_start_x = rack_area.x + (rack_area.w - (rack_slots * tile_w + (rack_slots - 1) * rack_pad)) * 0.5f;
-    float rack_start_y = rack_area.y + (rack_area.h - tile_h) * 0.5f;
+    float rack_start_x = layout.rack_area.x +
+                         (layout.rack_area.w - (rack_slots * tile_w + (rack_slots - 1) * rack_pad)) * 0.5f;
+    float rack_start_y = layout.rack_area.y + (layout.rack_area.h - tile_h) * 0.5f;
 
     Rect hand_rects[MAX_TILES];
     int hand_rect_count = 0;
@@ -913,7 +761,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     if (hand_dragging) {
         if (hover_hand_index >= 0) {
             drag_target = hover_hand_index;
-        } else if (point_in_rect((float)mx, (float)my, rack_area)) {
+        } else if (point_in_rect((float)mx, (float)my, layout.rack_area)) {
             float rel = (float)mx - rack_start_x;
             int idx = (int)(rel / (tile_w + rack_pad) + 0.5f);
             drag_target = clamp_int(idx, 0, p->hand_count - 1);
@@ -979,7 +827,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 int drop_comb = -1;
                 if (hover_table_comb >= 0) {
                     drop_comb = hover_table_comb;
-                } else if (game->active_comb_index >= 0 && point_in_rect((float)mx, (float)my, table_area)) {
+                } else if (game->active_comb_index >= 0 && point_in_rect((float)mx, (float)my, layout.table_area)) {
                     drop_comb = game->active_comb_index;
                 }
 
@@ -1017,7 +865,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                             }
                         }
                     }
-                } else if (point_in_rect((float)mx, (float)my, rack_area)) {
+                } else if (point_in_rect((float)mx, (float)my, layout.rack_area)) {
                     int drop_index = drag_target >= 0 ? drag_target : game->drag_hand_index;
                     hand_move_tile(p, game->selected, game->drag_hand_index, drop_index);
                 }
@@ -1040,7 +888,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                             }
                             insert_idx = base;
                         }
-                    } else if (point_in_rect((float)mx, (float)my, table_area)) {
+                    } else if (point_in_rect((float)mx, (float)my, layout.table_area)) {
                         if (game->table.count < MAX_COMB) {
                             int origin_comb = game->drag_table_comb;
                             int origin_idx = game->drag_table_index;
@@ -1069,7 +917,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                             ui_notify(game, NOTICE_ERROR, "Limite de combinaisons atteinte.");
                             audio_play_sfx(AUDIO_SFX_INVALID);
                         }
-                    } else if (point_in_rect((float)mx, (float)my, rack_area)) {
+                    } else if (point_in_rect((float)mx, (float)my, layout.rack_area)) {
                         ui_notify(game, NOTICE_WARN, "Impossible de reprendre une tuile sur le support.");
                         audio_play_sfx(AUDIO_SFX_INVALID);
                     }
@@ -1125,7 +973,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     bool input_blocked = game->drag_pending || game->dragging;
 
     if (mouse_pressed && !input_blocked) {
-        if (point_in_rect((float)mx, (float)my, menu_btn)) {
+        if (point_in_rect((float)mx, (float)my, layout.menu_btn)) {
             audio_play_sfx(AUDIO_SFX_CLICK);
             game->state = GUI_STATE_MENU;
             game->menu_selected_name = 0;
@@ -1133,21 +981,21 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             return;
         }
 
-        if (point_in_rect((float)mx, (float)my, sort_color_btn)) {
+        if (point_in_rect((float)mx, (float)my, layout.sort_color_btn)) {
             audio_play_sfx(AUDIO_SFX_CLICK);
             sort_player_hand(p, 1);
             ui_clear_selection(game->selected, MAX_TILES);
             if (!game->turn_played) {
                 backup_hand(game, p);
             }
-        } else if (point_in_rect((float)mx, (float)my, sort_value_btn)) {
+        } else if (point_in_rect((float)mx, (float)my, layout.sort_value_btn)) {
             audio_play_sfx(AUDIO_SFX_CLICK);
             sort_player_hand(p, 0);
             ui_clear_selection(game->selected, MAX_TILES);
             if (!game->turn_played) {
                 backup_hand(game, p);
             }
-        } else if (point_in_rect((float)mx, (float)my, draw_btn)) {
+        } else if (point_in_rect((float)mx, (float)my, layout.draw_btn)) {
             if (game->turn_played) {
                 ui_notify(game, NOTICE_WARN, "Pioche impossible apres avoir joue.");
                 audio_play_sfx(AUDIO_SFX_INVALID);
@@ -1160,7 +1008,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 game->prev_mouse_down = mouse_down;
                 return;
             }
-        } else if (point_in_rect((float)mx, (float)my, play_btn)) {
+        } else if (point_in_rect((float)mx, (float)my, layout.play_btn)) {
             audio_play_sfx(AUDIO_SFX_CLICK);
             int sel_idx[MAX_TILES];
             int sel_count = 0;
@@ -1226,7 +1074,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 ui_notify(game, NOTICE_WARN, "Selection vide ou trop courte.");
                 audio_play_sfx(AUDIO_SFX_INVALID);
             }
-        } else if (point_in_rect((float)mx, (float)my, validate_btn)) {
+        } else if (point_in_rect((float)mx, (float)my, layout.validate_btn)) {
             if (!game->turn_played) {
                 if (game->deck.top > 0) {
                     add_tile_to_player(p, draw_tile(&game->deck));
