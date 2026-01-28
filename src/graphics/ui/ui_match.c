@@ -281,16 +281,16 @@ static bool handle_game_over(GuiGame *game) {
 
     printf("[UI] Partie terminee. Scores sauvegardes dans scores.txt\n");
 
-    if (game->players_initialized) {
-        free_players(game->players, game->num_players);
-        game->players_initialized = false;
-    }
     free_table(&game->table);
     free_table(&game->table_backup);
     init_table(&game->table);
     init_table(&game->table_backup);
+    ui_clear_selection(game->selected, MAX_TILES);
+    game->active_comb_index = -1;
+    game->turn_points = 0;
+    game->turn_played = false;
 
-    game->state = GUI_STATE_MENU;
+    game->state = GUI_STATE_GAMEOVER;
     ui_input_reset(game);
     return true;
 }
@@ -634,7 +634,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
                      0.96f, 0.96f, 0.96f, 1.0f);
         char info[64];
-        snprintf(info, sizeof(info), "Score: %d%s", game->players[i].score,
+        int display_score = -calculate_hand_penalty(&game->players[i]);
+        snprintf(info, sizeof(info), "Score: %d%s", display_score,
                  game->players[i].is_ai ? " (IA)" : "");
         ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
                      0.88f, 0.88f, 0.88f, 1.0f);

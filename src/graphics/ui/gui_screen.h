@@ -9,7 +9,8 @@ typedef struct GuiWindow GuiWindow;
 
 typedef enum {
     GUI_STATE_MENU = 0,
-    GUI_STATE_MATCH = 1
+    GUI_STATE_MATCH = 1,
+    GUI_STATE_GAMEOVER = 2
 } GuiState;
 
 typedef struct {
