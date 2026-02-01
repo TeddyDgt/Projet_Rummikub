@@ -11,6 +11,12 @@
 #endif
 #include <GL/gl.h>
 
+/**
+ * @brief Prépare le pipeline OpenGL pour le rendu 2D.
+ * Configure la matrice de projection orthogonale (Y vers le bas) et active le mélange alpha (blending).
+ * @param fb_w Largeur du framebuffer.
+ * @param fb_h Hauteur du framebuffer.
+ */
 void r2d_begin(int fb_w, int fb_h) {
     glViewport(0, 0, fb_w, fb_h);
 
@@ -28,6 +34,12 @@ void r2d_begin(int fb_w, int fb_h) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+/**
+ * @brief Dessine un rectangle plein à l'écran.
+ * @param x, y Coordonnées du coin supérieur gauche.
+ * @param w, h Dimensions du rectangle.
+ * @param r, g, b, a Couleur et opacité (0.0f à 1.0f).
+ */
 void r2d_fill_rect(float x, float y, float w, float h,
                    float r, float g, float b, float a) {
     glColor4f(r, g, b, a);
@@ -39,6 +51,13 @@ void r2d_fill_rect(float x, float y, float w, float h,
     glEnd();
 }
 
+/**
+ * @brief Dessine le contour (bordure) d'un rectangle.
+ * @param x, y Position.
+ * @param w, h Dimensions.
+ * @param r, g, b, a Couleur.
+ * @param thickness Épaisseur de la ligne en pixels.
+ */
 void r2d_stroke_rect(float x, float y, float w, float h,
                      float r, float g, float b, float a,
                      float thickness) {
@@ -243,6 +262,11 @@ void draw_table_grid(const Rect *table_area,
     }
 }
 
+/**
+ * @brief Dessine une bannière de notification avec un effet d'estompage (fade out).
+ * @param table_area Rectangle définissant la zone de référence pour le placement.
+ * @param game Pointeur vers l'état du jeu pour accéder au texte et au timer de la notification.
+ */
 void draw_notification(const Rect *table_area, const GuiGame *game) {
     if (!table_area || !game) {
         return;

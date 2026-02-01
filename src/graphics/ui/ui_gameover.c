@@ -13,6 +13,11 @@
 
 #include <stdio.h>
 
+/**
+ * @brief Réinitialise la session de jeu actuelle et retourne au menu principal.
+ * Libère la mémoire des joueurs et des tables avant de basculer l'état de la machine à états.
+ * @param game Pointeur vers l'état global du jeu.
+ */
 static void gameover_to_menu(GuiGame *game) {
     if (!game) {
         return;
@@ -35,6 +40,14 @@ static void gameover_to_menu(GuiGame *game) {
     game->state = GUI_STATE_MENU;
 }
 
+/**
+ * @brief Rendu de l'écran de fin de partie.
+ * Affiche le classement des joueurs trié par score décroissant et gère le bouton de retour.
+ * @param game Pointeur vers l'état global du jeu.
+ * @param w Fenêtre GUI actuelle.
+ * @param fb_w Largeur du framebuffer.
+ * @param fb_h Hauteur du framebuffer.
+ */
 void ui_gameover_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     if (!game || !w) {
         return;

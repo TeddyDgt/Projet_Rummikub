@@ -6,6 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief Initialise la structure de la table.
+ * Met le compteur de combinaisons à zéro et initialise tous les pointeurs de tuiles à NULL.
+ * @param t Pointeur vers la table à initialiser.
+ */
 void init_table(Table *t) {
   t->count = 0;
   for (int i = 0; i < MAX_COMB; i++) {
@@ -15,6 +20,12 @@ void init_table(Table *t) {
   }
 }
 
+/**
+ * @brief Effectue une copie profonde d'une combinaison.
+ * Alloue dynamiquement un nouveau tableau de tuiles et y copie les données de la source.
+ * @param src Pointeur vers la combinaison source à copier.
+ * @return Une nouvelle structure Combinaison avec sa propre mémoire allouée.
+ */
 static Combinaison deep_copy_combinaison(const Combinaison *src) {
   Combinaison c;
   c.tiles = NULL;
@@ -38,6 +49,13 @@ static Combinaison deep_copy_combinaison(const Combinaison *src) {
   return c;
 }
 
+/**
+ * @brief Ajoute une combinaison à la table de jeu.
+ * Utilise une copie profonde pour s'assurer que la table possède sa propre instance des tuiles.
+ * Affiche une erreur si la limite MAX_COMB est atteinte.
+ * @param t Pointeur vers la table.
+ * @param c La combinaison à ajouter.
+ */
 void add_combinaison_to_table(Table *t, Combinaison c) {
   if (!t)
     return;
@@ -52,6 +70,12 @@ void add_combinaison_to_table(Table *t, Combinaison c) {
   t->count++;
 }
 
+/**
+ * @brief Vérifie l'intégrité de l'ensemble du plateau.
+ * Parcourt chaque combinaison sur la table et valide si elle respecte toujours les règles.
+ * @param t Pointeur vers la table.
+ * @return 1 si tout le plateau est valide, 0 si au moins une combinaison est incorrecte.
+ */
 int verify_whole_table(Table *t) {
   if (!t)
     return 0;
@@ -63,6 +87,12 @@ int verify_whole_table(Table *t) {
   return 1;
 }
 
+/**
+ * @brief Crée un clone complet d'une table existante.
+ * Utile pour simuler des coups sans modifier l'état réel du jeu.
+ * @param src Pointeur vers la table source.
+ * @return Une nouvelle structure Table contenant des copies indépendantes des combinaisons.
+ */
 Table clone_table(Table *src) {
   Table dst;
   init_table(&dst);
@@ -78,6 +108,11 @@ Table clone_table(Table *src) {
   return dst;
 }
 
+/**
+ * @brief Libère la mémoire de toutes les combinaisons sur la table.
+ * Parcourt la table pour libérer chaque tableau de tuiles alloué dynamiquement.
+ * @param t Pointeur vers la table à nettoyer.
+ */
 void free_table(Table *t) {
   if (!t)
     return;

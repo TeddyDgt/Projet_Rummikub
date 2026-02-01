@@ -17,6 +17,14 @@ static void trim_newline(char *s) {
     }
 }
 
+/**
+ * @brief Charge la configuration des joueurs depuis un fichier texte.
+ * Lit le nombre de joueurs, leurs noms et si ce sont des IA.
+ * @param names Tableau de chaînes pour stocker les noms.
+ * @param is_ai Tableau de booléens pour le statut IA.
+ * @param count Pointeur pour stocker le nombre de joueurs chargés.
+ * @return true si le fichier a été lu avec succès, false sinon.
+ */
 bool ui_persist_load_players(char names[4][16], bool is_ai[4], int *count) {
     FILE *f = fopen(PLAYERS_FILE, "r");
     if (!f) {
@@ -59,6 +67,12 @@ bool ui_persist_load_players(char names[4][16], bool is_ai[4], int *count) {
     return true;
 }
 
+/**
+ * @brief Sauvegarde la configuration actuelle des joueurs dans un fichier.
+ * @param names Noms des joueurs.
+ * @param is_ai Statuts IA.
+ * @param count Nombre de joueurs à sauvegarder.
+ */
 void ui_persist_save_players(const char names[4][16], const bool is_ai[4], int count) {
     FILE *f = fopen(PLAYERS_FILE, "w");
     if (!f) {

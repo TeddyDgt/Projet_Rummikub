@@ -71,6 +71,12 @@ static const unsigned char *glyph_5x7(char c) {
     return FONT_SPACE;
 }
 
+/**
+ * @brief Calcule la largeur d'une chaîne de caractères à une échelle donnée.
+ * @param text La chaîne à mesurer.
+ * @param scale Facteur d'agrandissement.
+ * @return Largeur totale en pixels.
+ */
 float ui_text_width(const char *text, float scale) {
     if (!text || !*text) {
         return 0.0f;
@@ -82,6 +88,15 @@ float ui_text_height(float scale) {
     return 7.0f * scale;
 }
 
+/**
+ * @brief Dessine du texte à l'écran.
+ * Parcourt chaque caractère et dessine les pixels correspondants selon la police bitmap 5x7.
+ * @param x Position X de départ.
+ * @param y Position Y de départ.
+ * @param scale Échelle du texte.
+ * @param text Chaîne à afficher.
+ * @param r, g, b, a Composantes de couleur et opacité.
+ */
 void ui_draw_text(float x, float y, float scale, const char *text,
                   float r, float g, float b, float a) {
     if (!text) {
@@ -104,6 +119,14 @@ void ui_draw_text(float x, float y, float scale, const char *text,
     }
 }
 
+/**
+ * @brief Centre et dessine du texte à l'intérieur d'un rectangle.
+ * Calcule automatiquement l'offset nécessaire pour l'alignement.
+ * @param r Rectangle de destination.
+ * @param scale Échelle du texte.
+ * @param text Chaîne à afficher.
+ * @param cr, cg, cb, ca Couleur du texte.
+ */
 void ui_draw_text_centered(Rect r, float scale, const char *text,
                            float cr, float cg, float cb, float ca) {
     float tw = ui_text_width(text, scale);

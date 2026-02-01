@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * @brief Mélange les tuiles d'un tableau de manière aléatoire.
+ * Utilise l'algorithme de Fisher-Yates.
+ * @param array Tableau de tuiles à mélanger.
+ * @param n Nombre d'éléments dans le tableau.
+ */
 void shuffle(Tile *array, unsigned int n) {
   if (n > 1) {
     for (unsigned int i = 0; i < n - 1; i++) {
@@ -14,6 +20,11 @@ void shuffle(Tile *array, unsigned int n) {
   }
 }
 
+/**
+ * @brief Initialise le deck avec les 106 tuiles réglementaires.
+ * Comprend deux sets de chaque couleur (1 à 13) et deux jokers, puis mélange le tout.
+ * @param d Pointeur vers le deck à initialiser.
+ */
 void init_deck(Deck *d) {
   int index = 0;
   for (int set = 0; set < 2; set++) { // Deux set de chaque couleur
@@ -40,6 +51,11 @@ void init_deck(Deck *d) {
   shuffle(d->tiles, MAX_TILES);
 }
 
+/**
+ * @brief Pioche une tuile au sommet du deck.
+ * @param d Pointeur vers le deck.
+ * @return La tuile piochée ou une tuile d'erreur si vide.
+ */
 Tile draw_tile(Deck *d) {
   if (d->top <= 0) {
     printf("Pioche vide !\n");

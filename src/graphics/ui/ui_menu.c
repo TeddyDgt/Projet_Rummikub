@@ -19,6 +19,10 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * @brief Supprime le dernier caractère du nom du joueur actuellement sélectionné.
+ * @param game Pointeur vers l'état global.
+ */
 static void menu_apply_backspace(GuiGame *game) {
     if (game->menu_selected_name < 0 || game->menu_selected_name >= 4) {
         return;
@@ -31,6 +35,11 @@ static void menu_apply_backspace(GuiGame *game) {
     name[len - 1] = '\0';
 }
 
+/**
+ * @brief Ajoute un caractère au nom du joueur sélectionné, dans la limite de 15 caractères.
+ * @param game Pointeur vers l'état global.
+ * @param c Caractère à ajouter.
+ */
 static void menu_append_char(GuiGame *game, char c) {
     if (game->menu_selected_name < 0 || game->menu_selected_name >= 4) {
         return;
@@ -131,6 +140,13 @@ static void menu_start_match(GuiGame *game) {
     game->state = GUI_STATE_MATCH;
 }
 
+/**
+ * @brief Gère le rendu et les interactions du menu principal.
+ * - Permet de modifier le nombre de joueurs (2 à 4).
+ * - Gère la sélection des champs de texte pour les noms.
+ * - Permet de basculer entre joueur humain et IA.
+ * - Lance la partie via le bouton "JOUER".
+ */
 void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     Rect panel = rect_make(fb_w * 0.2f, fb_h * 0.15f, fb_w * 0.6f, fb_h * 0.7f);
     Rect title = rect_make(panel.x, panel.y + 20.0f, panel.w, 40.0f);

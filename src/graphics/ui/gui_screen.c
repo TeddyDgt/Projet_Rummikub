@@ -4,6 +4,14 @@
 #include "ui_menu.h"
 #include "ui_gameover.h"
 
+/**
+ * @brief Point d'entrée du rendu global.
+ * Redirige l'affichage vers le module approprié (Menu, Match ou Gameover) selon l'état `game->state`.
+ * @param game Pointeur vers l'état global du jeu.
+ * @param w Fenêtre GUI.
+ * @param fb_w Largeur du framebuffer.
+ * @param fb_h Hauteur du framebuffer.
+ */
 void gui_game_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     if (!game || !w) {
         return;

@@ -24,6 +24,14 @@ static const char *g_sfx_paths[AUDIO_SFX_COUNT] = {
 
 static const char *g_bgm_path = "audio/bgm.wav";
 
+/**
+ * @brief Charge un son depuis un fichier avec un chemin de repli (fallback).
+ * Tente de charger le fichier au chemin indiqué, puis tente "../chemin" si le premier échoue.
+ * @param sound Pointeur vers la structure de son miniaudio.
+ * @param path Chemin vers le fichier audio.
+ * @param flags Drapeaux de configuration (ex: MA_SOUND_FLAG_STREAM).
+ * @return true si le son est chargé avec succès, false sinon.
+ */
 static bool audio_load_sound(ma_sound *sound, const char *path, ma_sound_flags flags) {
     if (!sound || !path) {
         return false;
@@ -40,6 +48,11 @@ static bool audio_load_sound(ma_sound *sound, const char *path, ma_sound_flags f
     return false;
 }
 
+/**
+ * @brief Initialise le moteur audio et charge toutes les ressources sonores.
+ * Configure la musique de fond en boucle (looping) et charge les différents SFX (click, invalid, draw, etc.).
+ * @return true si l'initialisation du moteur a réussi, false sinon.
+ */
 bool audio_init(void) {
     if (g_ready) {
         return true;
@@ -73,6 +86,10 @@ bool audio_init(void) {
     return true;
 }
 
+/**
+ * @brief Arrête le moteur audio et libère toutes les ressources chargées.
+ * Désinitialise la musique et chaque effet sonore avant d'éteindre le moteur miniaudio.
+ */
 void audio_shutdown(void) {
     if (!g_ready) {
         return;
@@ -94,6 +111,10 @@ void audio_shutdown(void) {
     g_ready = false;
 }
 
+/**
+ * @brief Lance la lecture de la musique de fond (BGM).
+ * La musique est configurée pour boucler automatiquement si elle a été chargée correctement.
+ */
 void audio_play_bgm(void) {
     if (!g_ready || !g_bgm_loaded) {
         return;
@@ -101,6 +122,9 @@ void audio_play_bgm(void) {
     ma_sound_start(&g_bgm);
 }
 
+/**
+ * @brief Arrête la lecture de la musique de fond.
+ */
 void audio_stop_bgm(void) {
     if (!g_ready || !g_bgm_loaded) {
         return;
@@ -108,6 +132,11 @@ void audio_stop_bgm(void) {
     ma_sound_stop(&g_bgm);
 }
 
+/**
+ * @brief Joue un effet sonore spécifique (SFX).
+ * Si le son est déjà en cours de lecture, il est stoppé et redémarré depuis le début.
+ * @param sfx L'identifiant de l'effet sonore à jouer (indexé sur AudioSfx).
+ */
 void audio_play_sfx(AudioSfx sfx) {
     if (!g_ready) {
         return;

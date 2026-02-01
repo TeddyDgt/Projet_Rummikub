@@ -37,6 +37,12 @@ enum {
     NOTICE_ERROR = 2
 };
 
+/**
+ * @brief Affiche une notification temporaire à l'écran (Info, Alerte ou Erreur).
+ * @param game Pointeur vers l'état global.
+ * @param kind Type de notification (NOTICE_INFO, NOTICE_WARN, NOTICE_ERROR).
+ * @param message Texte à afficher.
+ */
 static void ui_notify(GuiGame *game, int kind, const char *message) {
     if (!game || !message) {
         return;
@@ -516,6 +522,18 @@ static void ai_take_turn(GuiGame *game) {
     end_turn(game);
 }
 
+/**
+ * @brief Gère le rendu complet de la partie et les interactions complexes.
+ * - **Rendu** : Affiche la table, les combinaisons, la main du joueur actuel et les contrôles (Trier, Piocher, Valider).
+ * - **Interactions** : Gère la sélection multiple de tuiles et le glisser-déposer vers la table.
+ * - **Validation** : Vérifie la validité de la table lors de la validation du tour.
+ * - **Rollback** : En cas de table invalide, restaure l'état précédent à partir du backup.
+ * - **IA** : Appelle les routines de jeu automatique si le joueur actuel est une IA.
+ * @param game Pointeur vers l'état global du jeu.
+ * @param w Fenêtre GUI.
+ * @param fb_w Largeur du framebuffer.
+ * @param fb_h Hauteur du framebuffer.
+ */
 void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     const float margin = 20.0f;
     const float sidebar_w = 220.0f;
