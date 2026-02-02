@@ -1,7 +1,7 @@
---- Cumul 2026-01-28 12:13 ---
+--- Cumul 2026-02-02 15:49 ---
 Joueur 1;577
-Joueur 2;1196
-FEUR;544
+Joueur 2;1155
+FEUR;585
 JAI ENVIE DE;-58
 CREVER;-184
 ALAIDE;-160
