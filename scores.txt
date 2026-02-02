@@ -1,9 +1,0 @@
---- Cumul 2026-02-02 15:49 ---
-Joueur 1;577
-Joueur 2;1155
-FEUR;585
-JAI ENVIE DE;-58
-CREVER;-184
-ALAIDE;-160
-Joueur 3;-196
-Joueur 4;-1719

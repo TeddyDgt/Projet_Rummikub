@@ -31,6 +31,7 @@ void gui_game_init(GuiGame *game) {
     srand((unsigned int)time(NULL));
 
     game->state = GUI_STATE_MENU;
+    game->howto_return_state = GUI_STATE_MENU;
     game->menu_player_count = 2;
     for (int i = 0; i < 4; i++) {
         snprintf(game->menu_player_names[i], sizeof(game->menu_player_names[i]),
@@ -47,6 +48,7 @@ void gui_game_init(GuiGame *game) {
     game->notification_timer = 0.0f;
     game->notification_kind = 0;
     game->last_time = 0.0;
+    game->howto_cooldown_until = 0.0;
 
     audio_init();
     audio_play_bgm();

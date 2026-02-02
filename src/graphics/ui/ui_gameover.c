@@ -119,17 +119,26 @@ void ui_gameover_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                      0.90f, 0.90f, 0.90f, 1.0f);
     }
 
-    r2d_fill_rect(continue_btn.x, continue_btn.y, continue_btn.w, continue_btn.h, 0.20f, 0.30f, 0.20f, 1.0f);
-    r2d_stroke_rect(continue_btn.x, continue_btn.y, continue_btn.w, continue_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
-    ui_draw_text_centered(continue_btn, 1.6f, "CONTINUER", 0.96f, 0.96f, 0.96f, 1.0f);
-
     double mx = 0.0, my = 0.0;
     gui_get_mouse_pos(w, &mx, &my);
     bool mouse_down = gui_mouse_button_down(w, GUI_MOUSE_LEFT);
     bool mouse_clicked = mouse_down && !game->prev_mouse_down;
+    bool hover_continue = point_in_rect((float)mx, (float)my, continue_btn);
+
+    float br = hover_continue ? 0.26f : 0.20f;
+    float bg = hover_continue ? 0.36f : 0.30f;
+    float bb = hover_continue ? 0.26f : 0.20f;
+    if (mouse_down && hover_continue) {
+        br *= 0.85f;
+        bg *= 0.85f;
+        bb *= 0.85f;
+    }
+    r2d_fill_rect(continue_btn.x, continue_btn.y, continue_btn.w, continue_btn.h, br, bg, bb, 1.0f);
+    r2d_stroke_rect(continue_btn.x, continue_btn.y, continue_btn.w, continue_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
+    ui_draw_text_centered(continue_btn, 1.6f, "CONTINUER", 0.96f, 0.96f, 0.96f, 1.0f);
     game->prev_mouse_down = mouse_down;
 
-    if (mouse_clicked && point_in_rect((float)mx, (float)my, continue_btn)) {
+    if (mouse_clicked && hover_continue) {
         audio_play_sfx(AUDIO_SFX_CLICK);
         gameover_to_menu(game);
     }

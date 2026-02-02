@@ -10,7 +10,8 @@ typedef struct GuiWindow GuiWindow;
 typedef enum {
     GUI_STATE_MENU = 0,
     GUI_STATE_MATCH = 1,
-    GUI_STATE_GAMEOVER = 2
+    GUI_STATE_GAMEOVER = 2,
+    GUI_STATE_HOWTO = 3
 } GuiState;
 
 typedef struct {
@@ -55,7 +56,9 @@ typedef struct {
     float notification_timer;
     int notification_kind;
     double last_time;
+    double howto_cooldown_until;
     GuiState state;
+    GuiState howto_return_state;
 } GuiGame;
 
 void gui_game_init(GuiGame *game);

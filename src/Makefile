@@ -22,7 +22,8 @@ GLFW_CMAKE_FLAGS = -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXA
 CFLAGS += -Igraphics -I$(THIRD_PARTY)/miniaudio
 
 ifeq ($(OS),Windows_NT)
-GUI_EXEC = rummikub_gui.exe
+GUI_EXEC_NAME = rummikub_gui.exe
+GUI_EXEC = ../$(GUI_EXEC_NAME)
 GLFW_CMAKE_GEN ?= MinGW Makefiles
 ifneq ($(wildcard $(GLFW_DLL)),)
 ifneq ($(wildcard $(GLFW_IMP)),)
@@ -43,7 +44,8 @@ else
 PLATFORM_LIBS = -lglfw3 -lopengl32 -lgdi32 -lwinmm
 endif
 else
-GUI_EXEC = rummikub_gui
+GUI_EXEC_NAME = rummikub_gui
+GUI_EXEC = ../$(GUI_EXEC_NAME)
 ifneq ($(wildcard $(GLFW_DIR)/CMakeLists.txt),)
 USE_BUNDLED_GLFW = 1
 CFLAGS += -I$(GLFW_DIR)/include

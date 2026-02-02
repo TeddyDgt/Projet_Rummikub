@@ -11,6 +11,7 @@ typedef struct {
     Rect table_area;
     Rect bottom_area;
     Rect menu_btn;
+    Rect howto_btn;
     Rect sort_panel;
     Rect sort_color_btn;
     Rect sort_value_btn;

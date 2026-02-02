@@ -12,6 +12,7 @@
 
 #include "ui_input.h"
 #include "ui_rect.h"
+#include "ui_text.h"
 #include "ui_tiles.h"
 #include "ui_util.h"
 
@@ -856,6 +857,10 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                                    bottom_h);
 
     layout.menu_btn = rect_make(layout.sidebar.x, layout.sidebar.y, layout.sidebar.w, 36.0f);
+    layout.howto_btn = rect_make(layout.sidebar.x + 10.0f,
+                                 layout.sidebar.y + layout.menu_btn.h + 10.0f,
+                                 layout.sidebar.w - 20.0f,
+                                 30.0f);
 
     layout.sort_panel = rect_make(layout.bottom_area.x,
                                   layout.bottom_area.y + 10.0f,
@@ -897,6 +902,7 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     bool mouse_down = gui_mouse_button_down(w, GUI_MOUSE_LEFT);
     bool mouse_pressed = mouse_down && !game->prev_mouse_down;
     bool mouse_released = !mouse_down && game->prev_mouse_down;
+    bool howto_ready = now >= game->howto_cooldown_until;
 
     if (game->players[game->current_player].is_ai) {
         ai_take_turn(game);
@@ -908,6 +914,22 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     draw_match_background(&layout);
     draw_menu_button(&layout.menu_btn);
+
+    bool hover_howto = point_in_rect((float)mx, (float)my, layout.howto_btn);
+    float hbr = hover_howto ? 0.22f : 0.18f;
+    float hbg = hover_howto ? 0.26f : 0.22f;
+    float hbb = hover_howto ? 0.30f : 0.26f;
+    if (mouse_down && hover_howto) {
+        hbr *= 0.85f;
+        hbg *= 0.85f;
+        hbb *= 0.85f;
+    }
+    r2d_fill_rect(layout.howto_btn.x, layout.howto_btn.y, layout.howto_btn.w, layout.howto_btn.h,
+                  hbr, hbg, hbb, 1.0f);
+    r2d_stroke_rect(layout.howto_btn.x, layout.howto_btn.y, layout.howto_btn.w, layout.howto_btn.h,
+                    0.55f, 0.55f, 0.55f, 1.0f, 2.0f);
+    ui_draw_text_centered(layout.howto_btn, 1.0f, "COMMENT JOUER ?", 0.92f, 0.92f, 0.92f, 1.0f);
+
     draw_player_list(&layout, game);
 
     bool hover_sort_color = point_in_rect((float)mx, (float)my, layout.sort_color_btn);
@@ -1281,6 +1303,15 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
             audio_play_sfx(AUDIO_SFX_CLICK);
             game->state = GUI_STATE_MENU;
             game->menu_selected_name = 0;
+            ui_input_reset(game);
+            return;
+        }
+
+        if (howto_ready && point_in_rect((float)mx, (float)my, layout.howto_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
+            game->howto_return_state = GUI_STATE_MATCH;
+            game->state = GUI_STATE_HOWTO;
+            game->howto_cooldown_until = now + 0.25;
             ui_input_reset(game);
             return;
         }

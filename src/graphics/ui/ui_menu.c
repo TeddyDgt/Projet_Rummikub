@@ -211,7 +211,20 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     Rect count_label = rect_make(count_row.x + 60.0f, count_row.y, count_row.w - 120.0f, count_row.h);
 
     Rect names_panel = rect_make(panel.x + 40.0f, panel.y + 160.0f, panel.w - 80.0f, 220.0f);
+    Rect howto_btn = rect_make(panel.x + 140.0f, panel.y + panel.h - 140.0f, panel.w - 280.0f, 42.0f);
     Rect create_btn = rect_make(panel.x + 140.0f, panel.y + panel.h - 80.0f, panel.w - 280.0f, 50.0f);
+
+    double mx = 0.0, my = 0.0;
+    gui_get_mouse_pos(w, &mx, &my);
+    double now = gui_get_time_seconds();
+    bool mouse_down = gui_mouse_button_down(w, GUI_MOUSE_LEFT);
+    bool mouse_clicked = mouse_down && !game->prev_mouse_down;
+    bool howto_ready = now >= game->howto_cooldown_until;
+
+    bool hover_minus = point_in_rect((float)mx, (float)my, minus_btn);
+    bool hover_plus = point_in_rect((float)mx, (float)my, plus_btn);
+    bool hover_create = point_in_rect((float)mx, (float)my, create_btn);
+    bool hover_howto = point_in_rect((float)mx, (float)my, howto_btn);
 
     r2d_fill_rect(0.0f, 0.0f, (float)fb_w, (float)fb_h, 0.06f, 0.07f, 0.08f, 1.0f);
     r2d_fill_rect(panel.x, panel.y, panel.w, panel.h, 0.12f, 0.13f, 0.14f, 1.0f);
@@ -220,8 +233,24 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     ui_draw_text_centered(title, 3.0f, "RUMMIKUB", 0.92f, 0.92f, 0.92f, 1.0f);
 
     r2d_stroke_rect(count_row.x, count_row.y, count_row.w, count_row.h, 0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
-    r2d_fill_rect(minus_btn.x, minus_btn.y, minus_btn.w, minus_btn.h, 0.18f, 0.18f, 0.20f, 1.0f);
-    r2d_fill_rect(plus_btn.x, plus_btn.y, plus_btn.w, plus_btn.h, 0.18f, 0.18f, 0.20f, 1.0f);
+    {
+        float br = hover_minus ? 0.22f : 0.18f;
+        float bg = hover_minus ? 0.22f : 0.18f;
+        float bb = hover_minus ? 0.24f : 0.20f;
+        if (mouse_down && hover_minus) {
+            br *= 0.85f; bg *= 0.85f; bb *= 0.85f;
+        }
+        r2d_fill_rect(minus_btn.x, minus_btn.y, minus_btn.w, minus_btn.h, br, bg, bb, 1.0f);
+    }
+    {
+        float br = hover_plus ? 0.22f : 0.18f;
+        float bg = hover_plus ? 0.22f : 0.18f;
+        float bb = hover_plus ? 0.24f : 0.20f;
+        if (mouse_down && hover_plus) {
+            br *= 0.85f; bg *= 0.85f; bb *= 0.85f;
+        }
+        r2d_fill_rect(plus_btn.x, plus_btn.y, plus_btn.w, plus_btn.h, br, bg, bb, 1.0f);
+    }
 
     ui_draw_text_centered(minus_btn, 2.0f, "-", 0.90f, 0.90f, 0.90f, 1.0f);
     ui_draw_text_centered(plus_btn, 2.0f, "+", 0.90f, 0.90f, 0.90f, 1.0f);
@@ -240,31 +269,64 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                              names_panel.w,
                              row_h);
         Rect ai_btn = rect_make(row.x + row.w - 80.0f, row.y + 6.0f, 70.0f, row.h - 12.0f);
+        bool hover_row = point_in_rect((float)mx, (float)my, row);
         float bg = (i == game->menu_selected_name) ? 0.20f : 0.14f;
+        if (hover_row) {
+            bg += 0.04f;
+        }
         r2d_fill_rect(row.x, row.y, row.w, row.h, bg, bg + 0.02f, bg + 0.03f, 1.0f);
         r2d_stroke_rect(row.x, row.y, row.w, row.h, 0.40f, 0.40f, 0.40f, 1.0f, 2.0f);
         ui_draw_text(row.x + 12.0f, row.y + 10.0f, 1.6f, game->menu_player_names[i],
                      0.90f, 0.90f, 0.90f, 1.0f);
 
+        bool hover_ai = point_in_rect((float)mx, (float)my, ai_btn);
         if (game->menu_is_ai[i]) {
-            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.20f, 0.28f, 0.38f, 1.0f);
+            float ar = hover_ai ? 0.26f : 0.20f;
+            float ag = hover_ai ? 0.34f : 0.28f;
+            float ab = hover_ai ? 0.44f : 0.38f;
+            if (mouse_down && hover_ai) {
+                ar *= 0.85f; ag *= 0.85f; ab *= 0.85f;
+            }
+            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, ar, ag, ab, 1.0f);
             r2d_stroke_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.50f, 0.70f, 0.90f, 1.0f, 2.0f);
             ui_draw_text_centered(ai_btn, 1.3f, "IA", 0.92f, 0.92f, 0.92f, 1.0f);
         } else {
-            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.18f, 0.18f, 0.18f, 1.0f);
+            float ar = hover_ai ? 0.22f : 0.18f;
+            float ag = hover_ai ? 0.22f : 0.18f;
+            float ab = hover_ai ? 0.22f : 0.18f;
+            if (mouse_down && hover_ai) {
+                ar *= 0.85f; ag *= 0.85f; ab *= 0.85f;
+            }
+            r2d_fill_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, ar, ag, ab, 1.0f);
             r2d_stroke_rect(ai_btn.x, ai_btn.y, ai_btn.w, ai_btn.h, 0.45f, 0.45f, 0.45f, 1.0f, 2.0f);
             ui_draw_text_centered(ai_btn, 1.1f, "HUM", 0.90f, 0.90f, 0.90f, 1.0f);
         }
     }
 
-    r2d_fill_rect(create_btn.x, create_btn.y, create_btn.w, create_btn.h, 0.20f, 0.30f, 0.20f, 1.0f);
-    r2d_stroke_rect(create_btn.x, create_btn.y, create_btn.w, create_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
-    ui_draw_text_centered(create_btn, 2.0f, "CREER UNE PARTIE", 0.95f, 0.95f, 0.95f, 1.0f);
+    {
+        float br = hover_howto ? 0.22f : 0.18f;
+        float bg = hover_howto ? 0.26f : 0.22f;
+        float bb = hover_howto ? 0.30f : 0.26f;
+        if (mouse_down && hover_howto) {
+            br *= 0.85f; bg *= 0.85f; bb *= 0.85f;
+        }
+        r2d_fill_rect(howto_btn.x, howto_btn.y, howto_btn.w, howto_btn.h, br, bg, bb, 1.0f);
+        r2d_stroke_rect(howto_btn.x, howto_btn.y, howto_btn.w, howto_btn.h, 0.55f, 0.55f, 0.55f, 1.0f, 2.0f);
+        ui_draw_text_centered(howto_btn, 1.3f, "COMMENT JOUER ?", 0.94f, 0.94f, 0.94f, 1.0f);
+    }
 
-    double mx = 0.0, my = 0.0;
-    gui_get_mouse_pos(w, &mx, &my);
-    bool mouse_down = gui_mouse_button_down(w, GUI_MOUSE_LEFT);
-    bool mouse_clicked = mouse_down && !game->prev_mouse_down;
+    {
+        float br = hover_create ? 0.26f : 0.20f;
+        float bg = hover_create ? 0.36f : 0.30f;
+        float bb = hover_create ? 0.26f : 0.20f;
+        if (mouse_down && hover_create) {
+            br *= 0.85f; bg *= 0.85f; bb *= 0.85f;
+        }
+        r2d_fill_rect(create_btn.x, create_btn.y, create_btn.w, create_btn.h, br, bg, bb, 1.0f);
+        r2d_stroke_rect(create_btn.x, create_btn.y, create_btn.w, create_btn.h, 0.60f, 0.80f, 0.60f, 1.0f, 2.0f);
+        ui_draw_text_centered(create_btn, 2.0f, "CREER UNE PARTIE", 0.95f, 0.95f, 0.95f, 1.0f);
+    }
+
     game->prev_mouse_down = mouse_down;
 
     if (mouse_clicked) {
@@ -282,6 +344,12 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
                 game->menu_is_ai[game->menu_player_count - 1] = false;
             }
             audio_play_sfx(AUDIO_SFX_CLICK);
+        } else if (howto_ready && point_in_rect((float)mx, (float)my, howto_btn)) {
+            audio_play_sfx(AUDIO_SFX_CLICK);
+            game->howto_return_state = GUI_STATE_MENU;
+            game->state = GUI_STATE_HOWTO;
+            game->howto_cooldown_until = now + 0.25;
+            ui_input_reset(game);
         } else if (point_in_rect((float)mx, (float)my, create_btn)) {
             audio_play_sfx(AUDIO_SFX_PLAY);
             menu_start_match(game);

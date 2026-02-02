@@ -128,6 +128,9 @@ void draw_player_list(const MatchLayout *layout, const GuiGame *game) {
         return;
     }
     float player_panel_y = layout->menu_btn.y + layout->menu_btn.h + 20.0f;
+    if (layout->howto_btn.h > 0.0f) {
+        player_panel_y = layout->howto_btn.y + layout->howto_btn.h + 16.0f;
+    }
     float player_panel_h = 78.0f;
     float player_gap = 18.0f;
     for (int i = 0; i < game->num_players; i++) {
