@@ -11,13 +11,7 @@
 #include <time.h>
 
 /**
- * @brief Function gui_game_init.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function gui_game_init.
+ * @brief Initialise l'etat global du jeu.
  *
  * @param game Parameter game.
  * @return None.
@@ -55,13 +49,7 @@ void gui_game_init(GuiGame *game) {
 }
 
 /**
- * @brief Function gui_game_shutdown.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function gui_game_shutdown.
+ * @brief Libere les ressources et arrete l'audio.
  *
  * @param game Parameter game.
  * @return None.
@@ -80,5 +68,8 @@ void gui_game_shutdown(GuiGame *game) {
 
     audio_shutdown();
 }
+
+
+
 
 

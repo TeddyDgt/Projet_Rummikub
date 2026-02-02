@@ -25,15 +25,7 @@ static const char *g_sfx_paths[AUDIO_SFX_COUNT] = {
 static const char *g_bgm_path = "audio/bgm.wav";
 
 /**
- * @brief Function audio_load_sound.
- *
- * @param sound Parameter sound.
- * @param path Parameter path.
- * @param flags Parameter flags.
- * @return Result value.
- */
-/**
- * @brief Function audio_load_sound.
+ * @brief Realise l'operation audio_load_sound.
  *
  * @param sound Parameter sound.
  * @param path Parameter path.
@@ -57,12 +49,7 @@ static bool audio_load_sound(ma_sound *sound, const char *path, ma_sound_flags f
 }
 
 /**
- * @brief Function audio_init.
- *
- * @return Result value.
- */
-/**
- * @brief Function audio_init.
+ * @brief Initialise le systeme audio.
  *
  * @return Result value.
  */
@@ -100,12 +87,7 @@ bool audio_init(void) {
 }
 
 /**
- * @brief Function audio_shutdown.
- *
- * @return None.
- */
-/**
- * @brief Function audio_shutdown.
+ * @brief Arrete et nettoie le systeme audio.
  *
  * @return None.
  */
@@ -131,12 +113,7 @@ void audio_shutdown(void) {
 }
 
 /**
- * @brief Function audio_play_bgm.
- *
- * @return None.
- */
-/**
- * @brief Function audio_play_bgm.
+ * @brief Demarre la musique de fond si disponible.
  *
  * @return None.
  */
@@ -148,12 +125,7 @@ void audio_play_bgm(void) {
 }
 
 /**
- * @brief Function audio_stop_bgm.
- *
- * @return None.
- */
-/**
- * @brief Function audio_stop_bgm.
+ * @brief Arrete la musique de fond.
  *
  * @return None.
  */
@@ -165,13 +137,7 @@ void audio_stop_bgm(void) {
 }
 
 /**
- * @brief Function audio_play_sfx.
- *
- * @param sfx Parameter sfx.
- * @return None.
- */
-/**
- * @brief Function audio_play_sfx.
+ * @brief Joue un effet sonore.
  *
  * @param sfx Parameter sfx.
  * @return None.
@@ -191,5 +157,8 @@ void audio_play_sfx(AudioSfx sfx) {
     ma_sound_seek_to_pcm_frame(&g_sfx[sfx], 0);
     ma_sound_start(&g_sfx[sfx]);
 }
+
+
+
 
 

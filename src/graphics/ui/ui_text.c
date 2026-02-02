@@ -72,14 +72,7 @@ static const unsigned char *glyph_5x7(char c) {
 }
 
 /**
- * @brief Function ui_text_width.
- *
- * @param text Parameter text.
- * @param scale Parameter scale.
- * @return Result value.
- */
-/**
- * @brief Function ui_text_width.
+ * @brief Calcule la largeur d'un texte a une echelle donnee.
  *
  * @param text Parameter text.
  * @param scale Parameter scale.
@@ -93,13 +86,7 @@ float ui_text_width(const char *text, float scale) {
 }
 
 /**
- * @brief Function ui_text_height.
- *
- * @param scale Parameter scale.
- * @return Result value.
- */
-/**
- * @brief Function ui_text_height.
+ * @brief Calcule la hauteur d'un texte a une echelle donnee.
  *
  * @param scale Parameter scale.
  * @return Result value.
@@ -109,20 +96,7 @@ float ui_text_height(float scale) {
 }
 
 /**
- * @brief Function ui_draw_text.
- *
- * @param x Parameter x.
- * @param y Parameter y.
- * @param scale Parameter scale.
- * @param text Parameter text.
- * @param r Parameter r.
- * @param g Parameter g.
- * @param b Parameter b.
- * @param a Parameter a.
- * @return None.
- */
-/**
- * @brief Function ui_draw_text.
+ * @brief Affiche du texte en position ecran.
  *
  * @param x Parameter x.
  * @param y Parameter y.
@@ -157,19 +131,7 @@ void ui_draw_text(float x, float y, float scale, const char *text,
 }
 
 /**
- * @brief Function ui_draw_text_centered.
- *
- * @param r Parameter r.
- * @param scale Parameter scale.
- * @param text Parameter text.
- * @param cr Parameter cr.
- * @param cg Parameter cg.
- * @param cb Parameter cb.
- * @param ca Parameter ca.
- * @return None.
- */
-/**
- * @brief Function ui_draw_text_centered.
+ * @brief Affiche du texte centre dans un rectangle.
  *
  * @param r Parameter r.
  * @param scale Parameter scale.
@@ -188,5 +150,8 @@ void ui_draw_text_centered(Rect r, float scale, const char *text,
     float ty = r.y + (r.h - th) * 0.5f;
     ui_draw_text(tx, ty, scale, text, cr, cg, cb, ca);
 }
+
+
+
 
 

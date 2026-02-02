@@ -39,15 +39,7 @@ enum {
 };
 
 /**
- * @brief Function ui_notify.
- *
- * @param game Parameter game.
- * @param kind Parameter kind.
- * @param message Parameter message.
- * @return None.
- */
-/**
- * @brief Function ui_notify.
+ * @brief Realise l'operation ui_notify.
  *
  * @param game Parameter game.
  * @param kind Parameter kind.
@@ -65,15 +57,7 @@ static void ui_notify(GuiGame *game, int kind, const char *message) {
 }
 
 /**
- * @brief Function clamp_int.
- *
- * @param value Parameter value.
- * @param min Parameter min.
- * @param max Parameter max.
- * @return Result value.
- */
-/**
- * @brief Function clamp_int.
+ * @brief Realise l'operation clamp_int.
  *
  * @param value Parameter value.
  * @param min Parameter min.
@@ -91,14 +75,7 @@ static int clamp_int(int value, int min, int max) {
 }
 
 /**
- * @brief Checks whether edit table.
- *
- * @param game Parameter game.
- * @param p Parameter p.
- * @return Result value.
- */
-/**
- * @brief Function can_edit_table.
+ * @brief Verifie si edit table.
  *
  * @param game Parameter game.
  * @param p Parameter p.
@@ -112,15 +89,7 @@ static bool can_edit_table(const GuiGame *game, const Player *p) {
 }
 
 /**
- * @brief Function table_remove_tile.
- *
- * @param t Parameter t.
- * @param comb_idx Parameter comb_idx.
- * @param tile_idx Parameter tile_idx.
- * @return None.
- */
-/**
- * @brief Function table_remove_tile.
+ * @brief Realise l'operation table_remove_tile.
  *
  * @param t Parameter t.
  * @param comb_idx Parameter comb_idx.
@@ -155,16 +124,7 @@ static void table_remove_tile(Table *t, int comb_idx, int tile_idx) {
 }
 
 /**
- * @brief Function table_insert_tile.
- *
- * @param t Parameter t.
- * @param comb_idx Parameter comb_idx.
- * @param insert_idx Parameter insert_idx.
- * @param tile Parameter tile.
- * @return None.
- */
-/**
- * @brief Function table_insert_tile.
+ * @brief Realise l'operation table_insert_tile.
  *
  * @param t Parameter t.
  * @param comb_idx Parameter comb_idx.
@@ -198,14 +158,7 @@ static void table_insert_tile(Table *t, int comb_idx, int insert_idx, Tile tile)
 }
 
 /**
- * @brief Function table_add_new_comb.
- *
- * @param t Parameter t.
- * @param tile Parameter tile.
- * @return Result value.
- */
-/**
- * @brief Function table_add_new_comb.
+ * @brief Realise l'operation table_add_new_comb.
  *
  * @param t Parameter t.
  * @param tile Parameter tile.
@@ -229,17 +182,7 @@ static int table_add_new_comb(Table *t, Tile tile) {
 }
 
 /**
- * @brief Function table_move_tile.
- *
- * @param t Parameter t.
- * @param from_comb Parameter from_comb.
- * @param from_idx Parameter from_idx.
- * @param to_comb Parameter to_comb.
- * @param to_idx Parameter to_idx.
- * @return None.
- */
-/**
- * @brief Function table_move_tile.
+ * @brief Realise l'operation table_move_tile.
  *
  * @param t Parameter t.
  * @param from_comb Parameter from_comb.
@@ -313,16 +256,7 @@ static void table_move_tile(Table *t, int from_comb, int from_idx, int to_comb, 
 }
 
 /**
- * @brief Function hand_move_tile.
- *
- * @param p Parameter p.
- * @param selected Parameter selected.
- * @param from Parameter from.
- * @param to Parameter to.
- * @return None.
- */
-/**
- * @brief Function hand_move_tile.
+ * @brief Realise l'operation hand_move_tile.
  *
  * @param p Parameter p.
  * @param selected Parameter selected.
@@ -360,14 +294,7 @@ static void hand_move_tile(Player *p, bool *selected, int from, int to) {
 }
 
 /**
- * @brief Function backup_hand.
- *
- * @param game Parameter game.
- * @param p Parameter p.
- * @return None.
- */
-/**
- * @brief Function backup_hand.
+ * @brief Realise l'operation backup_hand.
  *
  * @param game Parameter game.
  * @param p Parameter p.
@@ -386,14 +313,7 @@ static void backup_hand(GuiGame *game, Player *p) {
 }
 
 /**
- * @brief Function restore_hand.
- *
- * @param game Parameter game.
- * @param p Parameter p.
- * @return None.
- */
-/**
- * @brief Function restore_hand.
+ * @brief Realise l'operation restore_hand.
  *
  * @param game Parameter game.
  * @param p Parameter p.
@@ -412,13 +332,7 @@ static void restore_hand(GuiGame *game, Player *p) {
 }
 
 /**
- * @brief Resets drag state.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function reset_drag_state.
+ * @brief Reinitialise drag state.
  *
  * @param game Parameter game.
  * @return None.
@@ -441,13 +355,7 @@ static void reset_drag_state(GuiGame *game) {
 }
 
 /**
- * @brief Handles game over.
- *
- * @param game Parameter game.
- * @return Result value.
- */
-/**
- * @brief Function handle_game_over.
+ * @brief Gere game over.
  *
  * @param game Parameter game.
  * @return Result value.
@@ -480,13 +388,7 @@ static bool handle_game_over(GuiGame *game) {
 }
 
 /**
- * @brief Begins turn.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function begin_turn.
+ * @brief Demarre turn.
  *
  * @param game Parameter game.
  * @return None.
@@ -505,13 +407,7 @@ static void begin_turn(GuiGame *game) {
 }
 
 /**
- * @brief Ends turn.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function end_turn.
+ * @brief Termine turn.
  *
  * @param game Parameter game.
  * @return None.
@@ -532,14 +428,7 @@ static void end_turn(GuiGame *game) {
 }
 
 /**
- * @brief Function ai_fill_index.
- *
- * @param p Parameter p.
- * @param param Parameter param.
- * @return None.
- */
-/**
- * @brief Function ai_fill_index.
+ * @brief Realise l'operation ai_fill_index.
  *
  * @param p Parameter p.
  * @param param Parameter param.
@@ -565,16 +454,7 @@ static void ai_fill_index(Player *p, int tile_index[5][14]) {
 }
 
 /**
- * @brief Function ai_pick_group.
- *
- * @param p Parameter p.
- * @param param Parameter param.
- * @param out Parameter out.
- * @param out_points Parameter out_points.
- * @return Result value.
- */
-/**
- * @brief Function ai_pick_group.
+ * @brief Realise l'operation ai_pick_group.
  *
  * @param p Parameter p.
  * @param param Parameter param.
@@ -628,16 +508,7 @@ static bool ai_pick_group(Player *p, const int tile_index[5][14], Combinaison *o
 }
 
 /**
- * @brief Function ai_pick_suite.
- *
- * @param p Parameter p.
- * @param param Parameter param.
- * @param out Parameter out.
- * @param out_points Parameter out_points.
- * @return Result value.
- */
-/**
- * @brief Function ai_pick_suite.
+ * @brief Realise l'operation ai_pick_suite.
  *
  * @param p Parameter p.
  * @param param Parameter param.
@@ -691,15 +562,7 @@ static bool ai_pick_suite(Player *p, const int tile_index[5][14], Combinaison *o
 }
 
 /**
- * @brief Function ai_pick_best_combination.
- *
- * @param p Parameter p.
- * @param out Parameter out.
- * @param out_points Parameter out_points.
- * @return Result value.
- */
-/**
- * @brief Function ai_pick_best_combination.
+ * @brief Realise l'operation ai_pick_best_combination.
  *
  * @param p Parameter p.
  * @param out Parameter out.
@@ -749,13 +612,7 @@ static bool ai_pick_best_combination(Player *p, Combinaison *out, int *out_point
 }
 
 /**
- * @brief Function ai_take_turn.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function ai_take_turn.
+ * @brief Realise l'operation ai_take_turn.
  *
  * @param game Parameter game.
  * @return None.
@@ -804,16 +661,7 @@ static void ai_take_turn(GuiGame *game) {
 }
 
 /**
- * @brief Function ui_match_render.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @param fb_w Parameter fb_w.
- * @param fb_h Parameter fb_h.
- * @return None.
- */
-/**
- * @brief Function ui_match_render.
+ * @brief Rend l'interface principale du match et gere les interactions.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -1472,5 +1320,8 @@ void ui_match_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     game->prev_mouse_down = mouse_down;
 }
+
+
+
 
 

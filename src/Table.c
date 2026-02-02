@@ -7,13 +7,7 @@
 #include <string.h>
 
 /**
- * @brief Initializes table.
- *
- * @param t Parameter t.
- * @return None.
- */
-/**
- * @brief Function init_table.
+ * @brief Initialise table.
  *
  * @param t Parameter t.
  * @return None.
@@ -28,13 +22,7 @@ void init_table(Table *t) {
 }
 
 /**
- * @brief Function deep_copy_combinaison.
- *
- * @param src Parameter src.
- * @return Result value.
- */
-/**
- * @brief Function deep_copy_combinaison.
+ * @brief Realise l'operation deep_copy_combinaison.
  *
  * @param src Parameter src.
  * @return Result value.
@@ -63,14 +51,7 @@ static Combinaison deep_copy_combinaison(const Combinaison *src) {
 }
 
 /**
- * @brief Adds combinaison to table.
- *
- * @param t Parameter t.
- * @param c Parameter c.
- * @return None.
- */
-/**
- * @brief Function add_combinaison_to_table.
+ * @brief Ajoute combinaison to table.
  *
  * @param t Parameter t.
  * @param c Parameter c.
@@ -91,13 +72,7 @@ void add_combinaison_to_table(Table *t, Combinaison c) {
 }
 
 /**
- * @brief Function verify_whole_table.
- *
- * @param t Parameter t.
- * @return Result value.
- */
-/**
- * @brief Function verify_whole_table.
+ * @brief Verifie que toutes les combinaisons de la table sont valides.
  *
  * @param t Parameter t.
  * @return Result value.
@@ -114,13 +89,7 @@ int verify_whole_table(Table *t) {
 }
 
 /**
- * @brief Clones table.
- *
- * @param src Parameter src.
- * @return Result value.
- */
-/**
- * @brief Function clone_table.
+ * @brief Duplique table.
  *
  * @param src Parameter src.
  * @return Result value.
@@ -141,13 +110,7 @@ Table clone_table(Table *src) {
 }
 
 /**
- * @brief Frees table.
- *
- * @param t Parameter t.
- * @return None.
- */
-/**
- * @brief Function free_table.
+ * @brief Libere table.
  *
  * @param t Parameter t.
  * @return None.
@@ -163,5 +126,8 @@ void free_table(Table *t) {
   }
   t->count = 0;
 }
+
+
+
 
 

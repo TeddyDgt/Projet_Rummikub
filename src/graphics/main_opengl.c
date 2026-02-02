@@ -9,12 +9,7 @@
 #include <GL/gl.h>
 
 /**
- * @brief Function main.
- *
- * @return Result value.
- */
-/**
- * @brief Function main.
+ * @brief Realise l'operation main.
  *
  * @return Result value.
  */
@@ -48,5 +43,8 @@ int main(void) {
     gui_destroy_window(w);
     return 0;
 }
+
+
+
 
 

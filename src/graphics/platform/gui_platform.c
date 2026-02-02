@@ -18,7 +18,7 @@ struct GuiWindow {
 };
 
 /**
- * @brief Callback d’erreur GLFW.
+ * @brief Realise l'operation error_callback.
  *
  * Cette fonction est appelée automatiquement par GLFW lorsqu’une erreur
  * survient. Elle permet d’afficher un message explicite sur la sortie
@@ -27,27 +27,13 @@ struct GuiWindow {
  * @param error Code d’erreur GLFW (non utilisé ici).
  * @param description Description textuelle de l’erreur.
  */
-/**
- * @brief Function error_callback.
- *
- * @param error Parameter error.
- * @param description Parameter description.
- * @return None.
- */
-/**
- * @brief Function error_callback.
- *
- * @param error Parameter error.
- * @param description Parameter description.
- * @return None.
- */
 static void error_callback(int error, const char* description) {
     (void)error;
     fprintf(stderr, "[GLFW] %s\n", description);
 }
 
 /**
- * @brief Crée et initialise une fenêtre graphique OpenGL.
+ * @brief Realise l'operation gui_create_window.
  *
  * Cette fonction :
  * - initialise la bibliothèque GLFW,
@@ -63,22 +49,6 @@ static void error_callback(int error, const char* description) {
  * @param height Hauteur de la fenêtre en pixels.
  * @param title Titre de la fenêtre.
  * @return Un pointeur vers GuiWindow si succès, NULL sinon.
- */
-/**
- * @brief Function gui_create_window.
- *
- * @param width Parameter width.
- * @param height Parameter height.
- * @param title Parameter title.
- * @return Result value.
- */
-/**
- * @brief Function gui_create_window.
- *
- * @param width Parameter width.
- * @param height Parameter height.
- * @param title Parameter title.
- * @return Result value.
  */
 GuiWindow* gui_create_window(int width, int height, const char* title) {
     glfwSetErrorCallback(error_callback);
@@ -114,7 +84,7 @@ GuiWindow* gui_create_window(int width, int height, const char* title) {
 }
 
 /**
- * @brief Détruit une fenêtre graphique et libère les ressources associées.
+ * @brief Realise l'operation gui_destroy_window.
  *
  * Cette fonction :
  * - détruit la fenêtre GLFW,
@@ -122,18 +92,6 @@ GuiWindow* gui_create_window(int width, int height, const char* title) {
  * - termine proprement la bibliothèque GLFW.
  *
  * @param w Pointeur vers la fenêtre à détruire.
- */
-/**
- * @brief Function gui_destroy_window.
- *
- * @param w Parameter w.
- * @return None.
- */
-/**
- * @brief Function gui_destroy_window.
- *
- * @param w Parameter w.
- * @return None.
  */
 void gui_destroy_window(GuiWindow* w) {
     if (!w) return;
@@ -143,7 +101,7 @@ void gui_destroy_window(GuiWindow* w) {
 }
 
 /**
- * @brief Indique si la fenêtre doit être fermée.
+ * @brief Realise l'operation gui_should_close.
  *
  * Cette fonction permet de savoir si l’utilisateur a demandé
  * la fermeture de la fenêtre (clic sur la croix, Alt+F4...... ).
@@ -151,61 +109,27 @@ void gui_destroy_window(GuiWindow* w) {
  * @param w Pointeur vers la fenêtre.
  * @return true si la fenêtre doit se fermer, false sinon.
  */
-/**
- * @brief Function gui_should_close.
- *
- * @param w Parameter w.
- * @return Result value.
- */
-/**
- * @brief Function gui_should_close.
- *
- * @param w Parameter w.
- * @return Result value.
- */
 bool gui_should_close(GuiWindow* w) {
     return w && w->handle && glfwWindowShouldClose(w->handle);
 }
 
 /**
- * @brief Traite les événements de la fenêtre.
+ * @brief Realise l'operation gui_poll_events.
  *
  * Cette fonction doit être appelée à chaque itération de la boucle
  * principale afin de traiter les événements clavier, souris et système c'est plus clairement un io update ici on établit l'etat actuel des controles utilisateur.
- */
-/**
- * @brief Function gui_poll_events.
- *
- * @return None.
- */
-/**
- * @brief Function gui_poll_events.
- *
- * @return None.
  */
 void gui_poll_events(void) {
     glfwPollEvents();
 }
 
 /**
- * @brief Échange les buffers d’affichage.
+ * @brief Realise l'operation gui_swap_buffers.
  *
  * Cette fonction affiche le contenu rendu dans le buffer arrière
  * et prépare le prochain cycle de rendu.
  *
  * @param w Pointeur vers la fenêtre.
- */
-/**
- * @brief Function gui_swap_buffers.
- *
- * @param w Parameter w.
- * @return None.
- */
-/**
- * @brief Function gui_swap_buffers.
- *
- * @param w Parameter w.
- * @return None.
  */
 void gui_swap_buffers(GuiWindow* w) {
     if (!w || !w->handle) return;
@@ -214,7 +138,7 @@ void gui_swap_buffers(GuiWindow* w) {
 
 
 /**
- * @brief Récupère la taille réelle du framebuffer.
+ * @brief Realise l'operation gui_get_framebuffer_size.
  *
  * La taille du framebuffer peut différer de la taille logique
  * de la fenêtre (notamment sur les écrans haut de gamme genre les 1080p, 2K, 4K..... Enfin plus l'image est grande plus le frame buffer sera imposant).
@@ -222,22 +146,6 @@ void gui_swap_buffers(GuiWindow* w) {
  * @param w Pointeur vers la fenêtre.
  * @param out_w Pointeur vers la largeur retournée (peut être NULL).
  * @param out_h Pointeur vers la hauteur retournée (peut être NULL).
- */
-/**
- * @brief Function gui_get_framebuffer_size.
- *
- * @param w Parameter w.
- * @param out_w Parameter out_w.
- * @param out_h Parameter out_h.
- * @return None.
- */
-/**
- * @brief Function gui_get_framebuffer_size.
- *
- * @param w Parameter w.
- * @param out_w Parameter out_w.
- * @param out_h Parameter out_h.
- * @return None.
  */
 void gui_get_framebuffer_size(GuiWindow* w, int* out_w, int* out_h) {
     if (!w || !w->handle) {
@@ -252,15 +160,7 @@ void gui_get_framebuffer_size(GuiWindow* w, int* out_w, int* out_h) {
 }
 
 /**
- * @brief Function gui_get_mouse_pos.
- *
- * @param w Parameter w.
- * @param out_x Parameter out_x.
- * @param out_y Parameter out_y.
- * @return None.
- */
-/**
- * @brief Function gui_get_mouse_pos.
+ * @brief Realise l'operation gui_get_mouse_pos.
  *
  * @param w Parameter w.
  * @param out_x Parameter out_x.
@@ -277,14 +177,7 @@ void gui_get_mouse_pos(GuiWindow* w, double* out_x, double* out_y) {
 }
 
 /**
- * @brief Function gui_mouse_button_down.
- *
- * @param w Parameter w.
- * @param button Parameter button.
- * @return Result value.
- */
-/**
- * @brief Function gui_mouse_button_down.
+ * @brief Realise l'operation gui_mouse_button_down.
  *
  * @param w Parameter w.
  * @param button Parameter button.
@@ -296,14 +189,7 @@ bool gui_mouse_button_down(GuiWindow* w, int button) {
 }
 
 /**
- * @brief Function gui_key_down.
- *
- * @param w Parameter w.
- * @param key Parameter key.
- * @return Result value.
- */
-/**
- * @brief Function gui_key_down.
+ * @brief Realise l'operation gui_key_down.
  *
  * @param w Parameter w.
  * @param key Parameter key.
@@ -315,17 +201,15 @@ bool gui_key_down(GuiWindow* w, int key) {
 }
 
 /**
- * @brief Function gui_get_time_seconds.
- *
- * @return Result value.
- */
-/**
- * @brief Function gui_get_time_seconds.
+ * @brief Realise l'operation gui_get_time_seconds.
  *
  * @return Result value.
  */
 double gui_get_time_seconds(void) {
     return glfwGetTime();
 }
+
+
+
 
 

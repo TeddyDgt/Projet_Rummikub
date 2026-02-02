@@ -73,15 +73,7 @@ int is_valid_suite(Combinaison *c) {
 }
 
 /**
- * @brief Adds tile to table comb.
- *
- * @param t Parameter t.
- * @param comb_idx Parameter comb_idx.
- * @param new_tile Parameter new_tile.
- * @return Result value.
- */
-/**
- * @brief Function add_tile_to_table_comb.
+ * @brief Ajoute tile to table comb.
  *
  * @param t Parameter t.
  * @param comb_idx Parameter comb_idx.
@@ -114,13 +106,7 @@ int add_tile_to_table_comb(Table *t, int comb_idx, Tile new_tile) {
 }
 
 /**
- * @brief Checks whether valid combination.
- *
- * @param c Parameter c.
- * @return Result value.
- */
-/**
- * @brief Function is_valid_combination.
+ * @brief Verifie si valid combination.
  *
  * @param c Parameter c.
  * @return Result value.
@@ -130,13 +116,7 @@ int is_valid_combination(Combinaison *c) {
 }
 
 /**
- * @brief Function combinaison_points.
- *
- * @param c Parameter c.
- * @return Result value.
- */
-/**
- * @brief Function combinaison_points.
+ * @brief Calcule le score total d'une combinaison.
  *
  * @param c Parameter c.
  * @return Result value.
@@ -187,5 +167,8 @@ int combinaison_points(const Combinaison *c) {
 
   return 0;
 }
+
+
+
 
 

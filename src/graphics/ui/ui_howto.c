@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 /**
- * @brief Function howto_draw_tile_row.
+ * @brief Realise l'operation howto_draw_tile_row.
  *
  * @param x Parameter x.
  * @param y Parameter y.
@@ -31,7 +31,7 @@ static void howto_draw_tile_row(float x, float y, float tile_w, float tile_h, co
 }
 
 /**
- * @brief Function ui_howto_render.
+ * @brief Rend l'ecran Comment jouer et ses exemples.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -142,3 +142,6 @@ void ui_howto_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         ui_input_reset(game);
     }
 }
+
+
+

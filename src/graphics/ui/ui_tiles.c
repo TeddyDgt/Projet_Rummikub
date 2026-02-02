@@ -6,16 +6,7 @@
 #include <stdio.h>
 
 /**
- * @brief Function tile_base_color.
- *
- * @param t Parameter t.
- * @param r Parameter r.
- * @param g Parameter g.
- * @param b Parameter b.
- * @return None.
- */
-/**
- * @brief Function tile_base_color.
+ * @brief Realise l'operation tile_base_color.
  *
  * @param t Parameter t.
  * @param r Parameter r.
@@ -61,16 +52,7 @@ static void tile_base_color(const Tile *t, float *r, float *g, float *b) {
 }
 
 /**
- * @brief Function tile_text_color.
- *
- * @param t Parameter t.
- * @param r Parameter r.
- * @param g Parameter g.
- * @param b Parameter b.
- * @return None.
- */
-/**
- * @brief Function tile_text_color.
+ * @brief Realise l'operation tile_text_color.
  *
  * @param t Parameter t.
  * @param r Parameter r.
@@ -94,18 +76,7 @@ static void tile_text_color(const Tile *t, float *r, float *g, float *b) {
 }
 
 /**
- * @brief Function ui_draw_tile.
- *
- * @param r Parameter r.
- * @param t Parameter t.
- * @param selected Parameter selected.
- * @param highlight Parameter highlight.
- * @param hovered Parameter hovered.
- * @param pressed Parameter pressed.
- * @return None.
- */
-/**
- * @brief Function ui_draw_tile.
+ * @brief Dessine une tuile avec ses etats visuels.
  *
  * @param r Parameter r.
  * @param t Parameter t.
@@ -164,5 +135,8 @@ void ui_draw_tile(Rect r, const Tile *t, bool selected, bool highlight, bool hov
         r2d_fill_rect(r.x, r.y, r.w, r.h, 0.0f, 0.0f, 0.0f, 0.25f);
     }
 }
+
+
+
 
 

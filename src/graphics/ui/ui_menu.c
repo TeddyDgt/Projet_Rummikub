@@ -20,13 +20,7 @@
 #include <string.h>
 
 /**
- * @brief Function menu_apply_backspace.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function menu_apply_backspace.
+ * @brief Realise l'operation menu_apply_backspace.
  *
  * @param game Parameter game.
  * @return None.
@@ -44,14 +38,7 @@ static void menu_apply_backspace(GuiGame *game) {
 }
 
 /**
- * @brief Function menu_append_char.
- *
- * @param game Parameter game.
- * @param c Parameter c.
- * @return None.
- */
-/**
- * @brief Function menu_append_char.
+ * @brief Realise l'operation menu_append_char.
  *
  * @param game Parameter game.
  * @param c Parameter c.
@@ -71,14 +58,7 @@ static void menu_append_char(GuiGame *game, char c) {
 }
 
 /**
- * @brief Function menu_handle_keyboard.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @return None.
- */
-/**
- * @brief Function menu_handle_keyboard.
+ * @brief Realise l'operation menu_handle_keyboard.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -111,13 +91,7 @@ static void menu_handle_keyboard(GuiGame *game, GuiWindow *w) {
 }
 
 /**
- * @brief Function menu_start_match.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function menu_start_match.
+ * @brief Realise l'operation menu_start_match.
  *
  * @param game Parameter game.
  * @return None.
@@ -184,16 +158,7 @@ static void menu_start_match(GuiGame *game) {
 }
 
 /**
- * @brief Function ui_menu_render.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @param fb_w Parameter fb_w.
- * @param fb_h Parameter fb_h.
- * @return None.
- */
-/**
- * @brief Function ui_menu_render.
+ * @brief Rend l'ecran de menu et gere les interactions.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -376,5 +341,8 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     menu_handle_keyboard(game, w);
 }
+
+
+
 
 

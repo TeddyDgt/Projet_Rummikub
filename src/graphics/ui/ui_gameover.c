@@ -14,13 +14,7 @@
 #include <stdio.h>
 
 /**
- * @brief Function gameover_to_menu.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function gameover_to_menu.
+ * @brief Realise l'operation gameover_to_menu.
  *
  * @param game Parameter game.
  * @return None.
@@ -48,16 +42,7 @@ static void gameover_to_menu(GuiGame *game) {
 }
 
 /**
- * @brief Function ui_gameover_render.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @param fb_w Parameter fb_w.
- * @param fb_h Parameter fb_h.
- * @return None.
- */
-/**
- * @brief Function ui_gameover_render.
+ * @brief Rend l'ecran de fin de partie.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -143,5 +128,8 @@ void ui_gameover_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
         gameover_to_menu(game);
     }
 }
+
+
+
 
 

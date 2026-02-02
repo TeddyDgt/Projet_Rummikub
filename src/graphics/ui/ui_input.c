@@ -5,15 +5,7 @@
 #include <string.h>
 
 /**
- * @brief Function ui_key_pressed.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @param key Parameter key.
- * @return Result value.
- */
-/**
- * @brief Function ui_key_pressed.
+ * @brief Realise l'operation ui_key_pressed.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -34,13 +26,7 @@ bool ui_key_pressed(GuiGame *game, GuiWindow *w, int key) {
 }
 
 /**
- * @brief Function ui_input_reset.
- *
- * @param game Parameter game.
- * @return None.
- */
-/**
- * @brief Function ui_input_reset.
+ * @brief Realise l'operation ui_input_reset.
  *
  * @param game Parameter game.
  * @return None.
@@ -52,5 +38,8 @@ void ui_input_reset(GuiGame *game) {
     game->prev_mouse_down = false;
     memset(game->key_prev, 0, sizeof(game->key_prev));
 }
+
+
+
 
 

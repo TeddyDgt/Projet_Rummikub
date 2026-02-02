@@ -6,16 +6,7 @@
 #include "ui_howto.h"
 
 /**
- * @brief Function gui_game_render.
- *
- * @param game Parameter game.
- * @param w Parameter w.
- * @param fb_w Parameter fb_w.
- * @param fb_h Parameter fb_h.
- * @return None.
- */
-/**
- * @brief Function gui_game_render.
+ * @brief Rend l'ecran correspondant a l'etat du jeu.
  *
  * @param game Parameter game.
  * @param w Parameter w.
@@ -45,5 +36,8 @@ void gui_game_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     ui_match_render(game, w, fb_w, fb_h);
 }
+
+
+
 
 

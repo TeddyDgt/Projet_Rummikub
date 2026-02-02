@@ -7,13 +7,7 @@
 #define PLAYERS_FILE "players.txt"
 
 /**
- * @brief Function trim_newline.
- *
- * @param s Parameter s.
- * @return None.
- */
-/**
- * @brief Function trim_newline.
+ * @brief Realise l'operation trim_newline.
  *
  * @param s Parameter s.
  * @return None.
@@ -30,15 +24,7 @@ static void trim_newline(char *s) {
 }
 
 /**
- * @brief Function ui_persist_load_players.
- *
- * @param param Parameter param.
- * @param is_ai Parameter is_ai.
- * @param count Parameter count.
- * @return Result value.
- */
-/**
- * @brief Function ui_persist_load_players.
+ * @brief Realise l'operation ui_persist_load_players.
  *
  * @param param Parameter param.
  * @param is_ai Parameter is_ai.
@@ -88,15 +74,7 @@ bool ui_persist_load_players(char names[4][16], bool is_ai[4], int *count) {
 }
 
 /**
- * @brief Function ui_persist_save_players.
- *
- * @param param Parameter param.
- * @param is_ai Parameter is_ai.
- * @param count Parameter count.
- * @return None.
- */
-/**
- * @brief Function ui_persist_save_players.
+ * @brief Realise l'operation ui_persist_save_players.
  *
  * @param param Parameter param.
  * @param is_ai Parameter is_ai.
@@ -122,5 +100,8 @@ void ui_persist_save_players(const char names[4][16], const bool is_ai[4], int c
     }
     fclose(f);
 }
+
+
+
 
 

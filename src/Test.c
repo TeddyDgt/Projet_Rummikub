@@ -10,12 +10,7 @@
 #include "structs.h"
 
 /**
- * @brief Function main.
- *
- * @return Result value.
- */
-/**
- * @brief Function main.
+ * @brief Realise l'operation main.
  *
  * @return Result value.
  */

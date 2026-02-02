@@ -1,16 +1,7 @@
 #include "ui_rect.h"
 
 /**
- * @brief Function rect_make.
- *
- * @param x Parameter x.
- * @param y Parameter y.
- * @param w Parameter w.
- * @param h Parameter h.
- * @return Result value.
- */
-/**
- * @brief Function rect_make.
+ * @brief Construit un rectangle a partir de coordonnees et dimensions.
  *
  * @param x Parameter x.
  * @param y Parameter y.
@@ -28,15 +19,7 @@ Rect rect_make(float x, float y, float w, float h) {
 }
 
 /**
- * @brief Function point_in_rect.
- *
- * @param px Parameter px.
- * @param py Parameter py.
- * @param r Parameter r.
- * @return Result value.
- */
-/**
- * @brief Function point_in_rect.
+ * @brief Verifie si un point est a l'interieur d'un rectangle.
  *
  * @param px Parameter px.
  * @param py Parameter py.
@@ -46,5 +29,8 @@ Rect rect_make(float x, float y, float w, float h) {
 int point_in_rect(float px, float py, Rect r) {
     return px >= r.x && px <= (r.x + r.w) && py >= r.y && py <= (r.y + r.h);
 }
+
+
+
 
 

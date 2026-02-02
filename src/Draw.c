@@ -4,14 +4,7 @@
 #include <stdlib.h>
 
 /**
- * @brief Function shuffle.
- *
- * @param array Parameter array.
- * @param n Parameter n.
- * @return None.
- */
-/**
- * @brief Function shuffle.
+ * @brief Melange un tableau de tuiles en place (shuffle).
  *
  * @param array Parameter array.
  * @param n Parameter n.
@@ -29,13 +22,7 @@ void shuffle(Tile *array, unsigned int n) {
 }
 
 /**
- * @brief Initializes deck.
- *
- * @param d Parameter d.
- * @return None.
- */
-/**
- * @brief Function init_deck.
+ * @brief Initialise le paquet complet et melange les tuiles.
  *
  * @param d Parameter d.
  * @return None.
@@ -67,13 +54,7 @@ void init_deck(Deck *d) {
 }
 
 /**
- * @brief Draws tile.
- *
- * @param d Parameter d.
- * @return Result value.
- */
-/**
- * @brief Function draw_tile.
+ * @brief Pioche la prochaine tuile du paquet.
  *
  * @param d Parameter d.
  * @return Result value.

@@ -3,14 +3,7 @@
 #include <string.h>
 
 /**
- * @brief Initializes player.
- *
- * @param p Parameter p.
- * @param name Parameter name.
- * @return None.
- */
-/**
- * @brief Function init_player.
+ * @brief Initialise player.
  *
  * @param p Parameter p.
  * @param name Parameter name.
@@ -27,14 +20,7 @@ void init_player(Player *p, const char *name) {
 }
 
 /**
- * @brief Adds tile to player.
- *
- * @param p Parameter p.
- * @param t Parameter t.
- * @return None.
- */
-/**
- * @brief Function add_tile_to_player.
+ * @brief Ajoute tile to player.
  *
  * @param p Parameter p.
  * @param t Parameter t.
@@ -48,14 +34,7 @@ void add_tile_to_player(Player *p, Tile t) {
 }
 
 /**
- * @brief Removes tile from hand.
- *
- * @param p Parameter p.
- * @param tile_id Parameter tile_id.
- * @return None.
- */
-/**
- * @brief Function remove_tile_from_hand.
+ * @brief Retire tile from hand.
  *
  * @param p Parameter p.
  * @param tile_id Parameter tile_id.
@@ -78,14 +57,7 @@ void remove_tile_from_hand(Player *p, int tile_id) {
 }
 
 /**
- * @brief Removes tile from player.
- *
- * @param p Parameter p.
- * @param tile_id Parameter tile_id.
- * @return Result value.
- */
-/**
- * @brief Function remove_tile_from_player.
+ * @brief Retire tile from player.
  *
  * @param p Parameter p.
  * @param tile_id Parameter tile_id.
@@ -98,13 +70,7 @@ int remove_tile_from_player(Player *p, int tile_id) {
 }
 
 /**
- * @brief Calculates hand penalty.
- *
- * @param p Parameter p.
- * @return Result value.
- */
-/**
- * @brief Function calculate_hand_penalty.
+ * @brief Calcule hand penalty.
  *
  * @param p Parameter p.
  * @return Result value.
@@ -121,14 +87,7 @@ int calculate_hand_penalty(Player *p) {
 }
 
 /**
- * @brief Sorts player hand.
- *
- * @param p Parameter p.
- * @param by_color Parameter by_color.
- * @return None.
- */
-/**
- * @brief Function sort_player_hand.
+ * @brief Trie player hand.
  *
  * @param p Parameter p.
  * @param by_color Parameter by_color.
@@ -170,14 +129,7 @@ void sort_player_hand(Player *p, int by_color) {
 }
 
 /**
- * @brief Function find_tile.
- *
- * @param p Parameter p.
- * @param id Parameter id.
- * @return Result value.
- */
-/**
- * @brief Function find_tile.
+ * @brief Recherche une tuile par id dans la main d'un joueur.
  *
  * @param p Parameter p.
  * @param id Parameter id.
@@ -192,14 +144,7 @@ Tile find_tile(Player *p, int id) {
 }
 
 /**
- * @brief Adds to table.
- *
- * @param t Parameter t.
- * @param c Parameter c.
- * @return None.
- */
-/**
- * @brief Function add_to_table.
+ * @brief Ajoute to table.
  *
  * @param t Parameter t.
  * @param c Parameter c.
@@ -219,14 +164,7 @@ void add_to_table(Table *t, Combinaison c) {
 }
 
 /**
- * @brief Frees players.
- *
- * @param players Parameter players.
- * @param n Parameter n.
- * @return None.
- */
-/**
- * @brief Function free_players.
+ * @brief Libere players.
  *
  * @param players Parameter players.
  * @param n Parameter n.
@@ -238,5 +176,8 @@ void free_players(Player players[], int n) {
     free(players[i].name);
   }
 }
+
+
+
 
 
