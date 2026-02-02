@@ -8,10 +8,20 @@
 #include <time.h>
 
 /**
- * @brief Distribue 14 tuiles initiales à chaque joueur et trie leur main par défaut.
- * @param d Pointeur vers le deck.
- * @param players Tableau des joueurs.
- * @param num_players Nombre de joueurs.
+ * @brief Function distribute_initial_tiles.
+ *
+ * @param d Parameter d.
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @return None.
+ */
+/**
+ * @brief Function distribute_initial_tiles.
+ *
+ * @param d Parameter d.
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @return None.
  */
 void distribute_initial_tiles(Deck *d, Player players[], int num_players) {
   for (int p = 0; p < num_players; p++) {
@@ -23,7 +33,20 @@ void distribute_initial_tiles(Deck *d, Player players[], int num_players) {
   }
 }
 
-
+/**
+ * @brief Function determine_first_player.
+ *
+ * @param d Parameter d.
+ * @param num_players Parameter num_players.
+ * @return Result value.
+ */
+/**
+ * @brief Function determine_first_player.
+ *
+ * @param d Parameter d.
+ * @param num_players Parameter num_players.
+ * @return Result value.
+ */
 int determine_first_player(Deck *d, int num_players) {
   int best_idx = 0;
   int max_val = -1;
@@ -37,6 +60,22 @@ int determine_first_player(Deck *d, int num_players) {
   return best_idx;
 }
 
+/**
+ * @brief Checks whether game over.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @param d Parameter d.
+ * @return Result value.
+ */
+/**
+ * @brief Function is_game_over.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @param d Parameter d.
+ * @return Result value.
+ */
 int is_game_over(Player players[], int num_players, Deck *d) {
   for (int i = 0; i < num_players; i++) {
     if (players[i].hand_count == 0)
@@ -46,10 +85,18 @@ int is_game_over(Player players[], int num_players, Deck *d) {
 }
 
 /**
- * @brief Calcule les scores finaux et affiche le tableau des scores.
- * Le gagnant reçoit la somme des pénalités des perdants.
- * @param players Tableau des joueurs.
- * @param num_players Nombre de joueurs.
+ * @brief Calculates final scores.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @return None.
+ */
+/**
+ * @brief Function calculate_final_scores.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @return None.
  */
 void calculate_final_scores(Player players[], int num_players) {
   if (!players || num_players <= 0) {
@@ -107,6 +154,18 @@ void calculate_final_scores(Player players[], int num_players) {
   }
 }
 
+/**
+ * @brief Function trim_newline.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
+/**
+ * @brief Function trim_newline.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
 static void trim_newline(char *s) {
   if (!s) {
     return;
@@ -118,6 +177,18 @@ static void trim_newline(char *s) {
   }
 }
 
+/**
+ * @brief Function trim_spaces.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
+/**
+ * @brief Function trim_spaces.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
 static void trim_spaces(char *s) {
   if (!s) {
     return;
@@ -136,6 +207,22 @@ static void trim_spaces(char *s) {
   }
 }
 
+/**
+ * @brief Function find_score_entry.
+ *
+ * @param param Parameter param.
+ * @param count Parameter count.
+ * @param name Parameter name.
+ * @return Result value.
+ */
+/**
+ * @brief Function find_score_entry.
+ *
+ * @param param Parameter param.
+ * @param count Parameter count.
+ * @param name Parameter name.
+ * @return Result value.
+ */
 static int find_score_entry(char names[][64], int count, const char *name) {
   for (int i = 0; i < count; i++) {
     if (strcmp(names[i], name) == 0) {
@@ -146,11 +233,20 @@ static int find_score_entry(char names[][64], int count, const char *name) {
 }
 
 /**
- * @brief Sauvegarde les scores dans un fichier texte avec un horodatage.
- * Si le joueur existe déjà dans le fichier, les nouveaux scores sont additionnés aux anciens.
- * @param players Tableau des joueurs.
- * @param num_players Nombre de joueurs.
- * @param filename Nom du fichier de destination.
+ * @brief Saves scores to file.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @param filename Parameter filename.
+ * @return None.
+ */
+/**
+ * @brief Function save_scores_to_file.
+ *
+ * @param players Parameter players.
+ * @param num_players Parameter num_players.
+ * @param filename Parameter filename.
+ * @return None.
  */
 void save_scores_to_file(Player players[], int num_players, char *filename) {
   if (!players || num_players <= 0 || !filename) {
@@ -226,3 +322,5 @@ void save_scores_to_file(Player players[], int num_players, char *filename) {
   }
   fclose(out);
 }
+
+

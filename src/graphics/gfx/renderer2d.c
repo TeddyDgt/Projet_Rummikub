@@ -11,12 +11,7 @@
 #endif
 #include <GL/gl.h>
 
-/**
- * @brief Prépare le pipeline OpenGL pour le rendu 2D.
- * Configure la matrice de projection orthogonale (Y vers le bas) et active le mélange alpha (blending).
- * @param fb_w Largeur du framebuffer.
- * @param fb_h Hauteur du framebuffer.
- */
+/* Sets up an orthographic 2D render state for the given framebuffer size. */
 void r2d_begin(int fb_w, int fb_h) {
     glViewport(0, 0, fb_w, fb_h);
 
@@ -34,12 +29,7 @@ void r2d_begin(int fb_w, int fb_h) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-/**
- * @brief Dessine un rectangle plein à l'écran.
- * @param x, y Coordonnées du coin supérieur gauche.
- * @param w, h Dimensions du rectangle.
- * @param r, g, b, a Couleur et opacité (0.0f à 1.0f).
- */
+/* Fills a rectangle in screen space with the given RGBA color. */
 void r2d_fill_rect(float x, float y, float w, float h,
                    float r, float g, float b, float a) {
     glColor4f(r, g, b, a);
@@ -51,13 +41,7 @@ void r2d_fill_rect(float x, float y, float w, float h,
     glEnd();
 }
 
-/**
- * @brief Dessine le contour (bordure) d'un rectangle.
- * @param x, y Position.
- * @param w, h Dimensions.
- * @param r, g, b, a Couleur.
- * @param thickness Épaisseur de la ligne en pixels.
- */
+/* Draws the outline of a rectangle in screen space with the given RGBA color. */
 void r2d_stroke_rect(float x, float y, float w, float h,
                      float r, float g, float b, float a,
                      float thickness) {
@@ -72,6 +56,7 @@ void r2d_stroke_rect(float x, float y, float w, float h,
     glLineWidth(1.0f);
 }
 
+/* Renders a text button with hover/press feedback using a filled rect + stroke. */
 static void draw_rect_button(Rect r,
                              const char *label,
                              float base_r, float base_g, float base_b,
@@ -104,6 +89,7 @@ static void draw_rect_button(Rect r,
     ui_draw_text_centered(r, text_scale, label, text_r, text_g, text_b, 1.0f);
 }
 
+/* Draws the static background panels for the match UI layout. */
 void draw_match_background(const MatchLayout *layout) {
     if (!layout) {
         return;
@@ -124,6 +110,7 @@ void draw_match_background(const MatchLayout *layout) {
                     0.30f, 0.30f, 0.30f, 1.0f, 2.0f);
 }
 
+/* Draws the top-left menu button. */
 void draw_menu_button(const Rect *menu_btn) {
     if (!menu_btn) {
         return;
@@ -135,6 +122,7 @@ void draw_menu_button(const Rect *menu_btn) {
     ui_draw_text_centered(*menu_btn, 1.6f, "MENU", 0.90f, 0.90f, 0.90f, 1.0f);
 }
 
+/* Draws the sidebar list of players, showing only the current player's score. */
 void draw_player_list(const MatchLayout *layout, const GuiGame *game) {
     if (!layout || !game) {
         return;
@@ -158,14 +146,20 @@ void draw_player_list(const MatchLayout *layout, const GuiGame *game) {
         ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
                      0.96f, 0.96f, 0.96f, 1.0f);
         char info[64];
-        int display_score = -calculate_hand_penalty((Player *)&game->players[i]);
-        snprintf(info, sizeof(info), "Score: %d%s", display_score,
-                 game->players[i].is_ai ? " (IA)" : "");
+        if (i == game->current_player) {
+            int display_score = -calculate_hand_penalty((Player *)&game->players[i]);
+            snprintf(info, sizeof(info), "Score: %d%s", display_score,
+                     game->players[i].is_ai ? " (IA)" : "");
+        } else {
+            snprintf(info, sizeof(info), "Score: ?%s",
+                     game->players[i].is_ai ? " (IA)" : "");
+        }
         ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
                      0.88f, 0.88f, 0.88f, 1.0f);
     }
 }
 
+/* Draws the sort buttons panel with hover/press states. */
 void draw_sort_buttons(const MatchLayout *layout, bool hover_color, bool hover_value, bool mouse_down) {
     if (!layout) {
         return;
@@ -196,6 +190,7 @@ void draw_sort_buttons(const MatchLayout *layout, bool hover_color, bool hover_v
                      hover_value, mouse_down && hover_value);
 }
 
+/* Draws the action buttons panel with hover/press states. */
 void draw_action_buttons(const MatchLayout *layout, bool hover_play, bool hover_validate, bool hover_draw, bool mouse_down) {
     if (!layout) {
         return;
@@ -236,6 +231,7 @@ void draw_action_buttons(const MatchLayout *layout, bool hover_play, bool hover_
                      hover_draw, mouse_down && hover_draw);
 }
 
+/* Draws the table grid cells for laying tiles in the match view. */
 void draw_table_grid(const Rect *table_area,
                      int grid_cols,
                      int grid_rows,
@@ -248,6 +244,7 @@ void draw_table_grid(const Rect *table_area,
     if (!table_area) {
         return;
     }
+    (void)grid_rows;
     for (int i = 0; i < total_cells; i++) {
         int row = i / grid_cols;
         int col = i % grid_cols;
@@ -262,11 +259,7 @@ void draw_table_grid(const Rect *table_area,
     }
 }
 
-/**
- * @brief Dessine une bannière de notification avec un effet d'estompage (fade out).
- * @param table_area Rectangle définissant la zone de référence pour le placement.
- * @param game Pointeur vers l'état du jeu pour accéder au texte et au timer de la notification.
- */
+/* Draws a temporary notification banner over the table area. */
 void draw_notification(const Rect *table_area, const GuiGame *game) {
     if (!table_area || !game) {
         return;
@@ -292,3 +285,5 @@ void draw_notification(const Rect *table_area, const GuiGame *game) {
     r2d_stroke_rect(notice.x, notice.y, notice.w, notice.h, 0.90f, 0.90f, 0.90f, alpha, 2.0f);
     ui_draw_text_centered(notice, 1.2f, game->notification, 0.98f, 0.98f, 0.98f, alpha);
 }
+
+

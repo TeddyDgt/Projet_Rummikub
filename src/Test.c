@@ -9,6 +9,16 @@
 #include "Players.h"
 #include "structs.h"
 
+/**
+ * @brief Function main.
+ *
+ * @return Result value.
+ */
+/**
+ * @brief Function main.
+ *
+ * @return Result value.
+ */
 int main(void) {
   // 1. INITIALISATION DE L'ALÉATOIRE (Fixe le problème n°1)
   srand(time(NULL));

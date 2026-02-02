@@ -11,12 +11,16 @@
 #include <time.h>
 
 /**
- * @brief Initialise l'état global du moteur graphique et du jeu.
- * - Initialise le générateur de nombres aléatoires.
- * - Charge la persistance des joueurs (noms, types IA).
- * - Initialise la table de jeu et ses sauvegardes.
- * - Configure les timers de notification.
- * @param game Pointeur vers la structure GuiGame à initialiser.
+ * @brief Function gui_game_init.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
+/**
+ * @brief Function gui_game_init.
+ *
+ * @param game Parameter game.
+ * @return None.
  */
 void gui_game_init(GuiGame *game) {
     if (!game) {
@@ -48,6 +52,18 @@ void gui_game_init(GuiGame *game) {
     audio_play_bgm();
 }
 
+/**
+ * @brief Function gui_game_shutdown.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
+/**
+ * @brief Function gui_game_shutdown.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
 void gui_game_shutdown(GuiGame *game) {
     if (!game) {
         return;
@@ -62,3 +78,5 @@ void gui_game_shutdown(GuiGame *game) {
 
     audio_shutdown();
 }
+
+

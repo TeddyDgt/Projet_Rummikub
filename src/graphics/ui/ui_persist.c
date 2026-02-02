@@ -6,6 +6,18 @@
 
 #define PLAYERS_FILE "players.txt"
 
+/**
+ * @brief Function trim_newline.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
+/**
+ * @brief Function trim_newline.
+ *
+ * @param s Parameter s.
+ * @return None.
+ */
 static void trim_newline(char *s) {
     if (!s) {
         return;
@@ -18,12 +30,20 @@ static void trim_newline(char *s) {
 }
 
 /**
- * @brief Charge la configuration des joueurs depuis un fichier texte.
- * Lit le nombre de joueurs, leurs noms et si ce sont des IA.
- * @param names Tableau de chaînes pour stocker les noms.
- * @param is_ai Tableau de booléens pour le statut IA.
- * @param count Pointeur pour stocker le nombre de joueurs chargés.
- * @return true si le fichier a été lu avec succès, false sinon.
+ * @brief Function ui_persist_load_players.
+ *
+ * @param param Parameter param.
+ * @param is_ai Parameter is_ai.
+ * @param count Parameter count.
+ * @return Result value.
+ */
+/**
+ * @brief Function ui_persist_load_players.
+ *
+ * @param param Parameter param.
+ * @param is_ai Parameter is_ai.
+ * @param count Parameter count.
+ * @return Result value.
  */
 bool ui_persist_load_players(char names[4][16], bool is_ai[4], int *count) {
     FILE *f = fopen(PLAYERS_FILE, "r");
@@ -68,10 +88,20 @@ bool ui_persist_load_players(char names[4][16], bool is_ai[4], int *count) {
 }
 
 /**
- * @brief Sauvegarde la configuration actuelle des joueurs dans un fichier.
- * @param names Noms des joueurs.
- * @param is_ai Statuts IA.
- * @param count Nombre de joueurs à sauvegarder.
+ * @brief Function ui_persist_save_players.
+ *
+ * @param param Parameter param.
+ * @param is_ai Parameter is_ai.
+ * @param count Parameter count.
+ * @return None.
+ */
+/**
+ * @brief Function ui_persist_save_players.
+ *
+ * @param param Parameter param.
+ * @param is_ai Parameter is_ai.
+ * @param count Parameter count.
+ * @return None.
  */
 void ui_persist_save_players(const char names[4][16], const bool is_ai[4], int count) {
     FILE *f = fopen(PLAYERS_FILE, "w");
@@ -92,3 +122,5 @@ void ui_persist_save_players(const char names[4][16], const bool is_ai[4], int c
     }
     fclose(f);
 }
+
+

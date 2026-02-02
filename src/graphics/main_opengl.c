@@ -8,6 +8,16 @@
 #endif
 #include <GL/gl.h>
 
+/**
+ * @brief Function main.
+ *
+ * @return Result value.
+ */
+/**
+ * @brief Function main.
+ *
+ * @return Result value.
+ */
 int main(void) {
     GuiWindow *w = gui_create_window(1280, 720, "Rummikub - GUI");
     if (!w) {
@@ -38,3 +48,5 @@ int main(void) {
     gui_destroy_window(w);
     return 0;
 }
+
+

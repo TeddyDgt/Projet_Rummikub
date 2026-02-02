@@ -1,12 +1,22 @@
 #include "ui_rect.h"
 
 /**
- * @brief Crée une structure Rect initialisée.
- * @param x Position horizontale.
- * @param y Position verticale.
- * @param w Largeur.
- * @param h Hauteur.
- * @return Une structure Rect remplie.
+ * @brief Function rect_make.
+ *
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @return Result value.
+ */
+/**
+ * @brief Function rect_make.
+ *
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @return Result value.
  */
 Rect rect_make(float x, float y, float w, float h) {
     Rect r;
@@ -18,13 +28,23 @@ Rect rect_make(float x, float y, float w, float h) {
 }
 
 /**
- * @brief Vérifie si un point se trouve à l'intérieur d'un rectangle.
- * Utilisé principalement pour le picking (souris sur bouton/tuile).
- * @param px Coordonnée X du point.
- * @param py Coordonnée Y du point.
- * @param r Rectangle cible.
- * @return 1 si le point est dedans, 0 sinon.
+ * @brief Function point_in_rect.
+ *
+ * @param px Parameter px.
+ * @param py Parameter py.
+ * @param r Parameter r.
+ * @return Result value.
+ */
+/**
+ * @brief Function point_in_rect.
+ *
+ * @param px Parameter px.
+ * @param py Parameter py.
+ * @param r Parameter r.
+ * @return Result value.
  */
 int point_in_rect(float px, float py, Rect r) {
     return px >= r.x && px <= (r.x + r.w) && py >= r.y && py <= (r.y + r.h);
 }
+
+

@@ -3,10 +3,18 @@
 #include <string.h>
 
 /**
- * @brief Initialise un nouveau joueur.
- * Alloue la mémoire pour le nom et la main (taille MAX_TILES).
- * @param p Pointeur vers le joueur.
- * @param name Nom du joueur.
+ * @brief Initializes player.
+ *
+ * @param p Parameter p.
+ * @param name Parameter name.
+ * @return None.
+ */
+/**
+ * @brief Function init_player.
+ *
+ * @param p Parameter p.
+ * @param name Parameter name.
+ * @return None.
  */
 void init_player(Player *p, const char *name) {
   p->name = strdup(name);
@@ -18,7 +26,20 @@ void init_player(Player *p, const char *name) {
   p->hand = malloc(sizeof(Tile) * MAX_TILES);
 }
 
-
+/**
+ * @brief Adds tile to player.
+ *
+ * @param p Parameter p.
+ * @param t Parameter t.
+ * @return None.
+ */
+/**
+ * @brief Function add_tile_to_player.
+ *
+ * @param p Parameter p.
+ * @param t Parameter t.
+ * @return None.
+ */
 void add_tile_to_player(Player *p, Tile t) {
   if (p->hand_count < MAX_TILES) {
     p->hand[p->hand_count] = t;
@@ -27,10 +48,18 @@ void add_tile_to_player(Player *p, Tile t) {
 }
 
 /**
- * @brief Retire une tuile spécifique de la main du joueur par son ID.
- * Décale les tuiles restantes pour boucher le vide.
- * @param p Pointeur vers le joueur.
- * @param tile_id Identifiant unique de la tuile à retirer.
+ * @brief Removes tile from hand.
+ *
+ * @param p Parameter p.
+ * @param tile_id Parameter tile_id.
+ * @return None.
+ */
+/**
+ * @brief Function remove_tile_from_hand.
+ *
+ * @param p Parameter p.
+ * @param tile_id Parameter tile_id.
+ * @return None.
  */
 void remove_tile_from_hand(Player *p, int tile_id) {
   int found_idx = -1;
@@ -48,6 +77,20 @@ void remove_tile_from_hand(Player *p, int tile_id) {
   }
 }
 
+/**
+ * @brief Removes tile from player.
+ *
+ * @param p Parameter p.
+ * @param tile_id Parameter tile_id.
+ * @return Result value.
+ */
+/**
+ * @brief Function remove_tile_from_player.
+ *
+ * @param p Parameter p.
+ * @param tile_id Parameter tile_id.
+ * @return Result value.
+ */
 int remove_tile_from_player(Player *p, int tile_id) {
   int before = p->hand_count;
   remove_tile_from_hand(p, tile_id);
@@ -55,10 +98,16 @@ int remove_tile_from_player(Player *p, int tile_id) {
 }
 
 /**
- * @brief Calcule la pénalité des tuiles restant en main en fin de partie.
- * Les tuiles normales valent leur valeur, les jokers valent 30 points.
- * @param p Pointeur vers le joueur.
- * @return Total des points de pénalité.
+ * @brief Calculates hand penalty.
+ *
+ * @param p Parameter p.
+ * @return Result value.
+ */
+/**
+ * @brief Function calculate_hand_penalty.
+ *
+ * @param p Parameter p.
+ * @return Result value.
  */
 int calculate_hand_penalty(Player *p) {
   if (!p) {
@@ -72,9 +121,18 @@ int calculate_hand_penalty(Player *p) {
 }
 
 /**
- * @brief Trie la main du joueur selon deux critères possibles.
- * @param p Pointeur vers le joueur.
- * @param by_color Si 1, trie par couleur puis valeur. Si 0, trie par valeur puis couleur.
+ * @brief Sorts player hand.
+ *
+ * @param p Parameter p.
+ * @param by_color Parameter by_color.
+ * @return None.
+ */
+/**
+ * @brief Function sort_player_hand.
+ *
+ * @param p Parameter p.
+ * @param by_color Parameter by_color.
+ * @return None.
  */
 void sort_player_hand(Player *p, int by_color) {
   if (p->hand_count < 2)
@@ -111,6 +169,20 @@ void sort_player_hand(Player *p, int by_color) {
   }
 }
 
+/**
+ * @brief Function find_tile.
+ *
+ * @param p Parameter p.
+ * @param id Parameter id.
+ * @return Result value.
+ */
+/**
+ * @brief Function find_tile.
+ *
+ * @param p Parameter p.
+ * @param id Parameter id.
+ * @return Result value.
+ */
 Tile find_tile(Player *p, int id) {
   for (int i = 0; i < p->hand_count; i++) {
     if (p->hand[i].id == id)
@@ -119,6 +191,20 @@ Tile find_tile(Player *p, int id) {
   return (Tile){-1, 0, NOIR, 0}; // Retourne un ID -1 si non trouvé
 }
 
+/**
+ * @brief Adds to table.
+ *
+ * @param t Parameter t.
+ * @param c Parameter c.
+ * @return None.
+ */
+/**
+ * @brief Function add_to_table.
+ *
+ * @param t Parameter t.
+ * @param c Parameter c.
+ * @return None.
+ */
 void add_to_table(Table *t, Combinaison c) {
   if (t->count < MAX_COMB) {
     // On alloue de la mémoire pour stocker les tuiles dans la table
@@ -132,9 +218,25 @@ void add_to_table(Table *t, Combinaison c) {
   }
 }
 
+/**
+ * @brief Frees players.
+ *
+ * @param players Parameter players.
+ * @param n Parameter n.
+ * @return None.
+ */
+/**
+ * @brief Function free_players.
+ *
+ * @param players Parameter players.
+ * @param n Parameter n.
+ * @return None.
+ */
 void free_players(Player players[], int n) {
   for (int i = 0; i < n; i++) {
     free(players[i].hand);
     free(players[i].name);
   }
 }
+
+

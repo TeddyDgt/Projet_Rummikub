@@ -27,6 +27,20 @@ struct GuiWindow {
  * @param error Code d’erreur GLFW (non utilisé ici).
  * @param description Description textuelle de l’erreur.
  */
+/**
+ * @brief Function error_callback.
+ *
+ * @param error Parameter error.
+ * @param description Parameter description.
+ * @return None.
+ */
+/**
+ * @brief Function error_callback.
+ *
+ * @param error Parameter error.
+ * @param description Parameter description.
+ * @return None.
+ */
 static void error_callback(int error, const char* description) {
     (void)error;
     fprintf(stderr, "[GLFW] %s\n", description);
@@ -49,6 +63,22 @@ static void error_callback(int error, const char* description) {
  * @param height Hauteur de la fenêtre en pixels.
  * @param title Titre de la fenêtre.
  * @return Un pointeur vers GuiWindow si succès, NULL sinon.
+ */
+/**
+ * @brief Function gui_create_window.
+ *
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param title Parameter title.
+ * @return Result value.
+ */
+/**
+ * @brief Function gui_create_window.
+ *
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param title Parameter title.
+ * @return Result value.
  */
 GuiWindow* gui_create_window(int width, int height, const char* title) {
     glfwSetErrorCallback(error_callback);
@@ -93,6 +123,18 @@ GuiWindow* gui_create_window(int width, int height, const char* title) {
  *
  * @param w Pointeur vers la fenêtre à détruire.
  */
+/**
+ * @brief Function gui_destroy_window.
+ *
+ * @param w Parameter w.
+ * @return None.
+ */
+/**
+ * @brief Function gui_destroy_window.
+ *
+ * @param w Parameter w.
+ * @return None.
+ */
 void gui_destroy_window(GuiWindow* w) {
     if (!w) return;
     if (w->handle) glfwDestroyWindow(w->handle);
@@ -109,6 +151,18 @@ void gui_destroy_window(GuiWindow* w) {
  * @param w Pointeur vers la fenêtre.
  * @return true si la fenêtre doit se fermer, false sinon.
  */
+/**
+ * @brief Function gui_should_close.
+ *
+ * @param w Parameter w.
+ * @return Result value.
+ */
+/**
+ * @brief Function gui_should_close.
+ *
+ * @param w Parameter w.
+ * @return Result value.
+ */
 bool gui_should_close(GuiWindow* w) {
     return w && w->handle && glfwWindowShouldClose(w->handle);
 }
@@ -118,6 +172,16 @@ bool gui_should_close(GuiWindow* w) {
  *
  * Cette fonction doit être appelée à chaque itération de la boucle
  * principale afin de traiter les événements clavier, souris et système c'est plus clairement un io update ici on établit l'etat actuel des controles utilisateur.
+ */
+/**
+ * @brief Function gui_poll_events.
+ *
+ * @return None.
+ */
+/**
+ * @brief Function gui_poll_events.
+ *
+ * @return None.
  */
 void gui_poll_events(void) {
     glfwPollEvents();
@@ -130,6 +194,18 @@ void gui_poll_events(void) {
  * et prépare le prochain cycle de rendu.
  *
  * @param w Pointeur vers la fenêtre.
+ */
+/**
+ * @brief Function gui_swap_buffers.
+ *
+ * @param w Parameter w.
+ * @return None.
+ */
+/**
+ * @brief Function gui_swap_buffers.
+ *
+ * @param w Parameter w.
+ * @return None.
  */
 void gui_swap_buffers(GuiWindow* w) {
     if (!w || !w->handle) return;
@@ -147,6 +223,22 @@ void gui_swap_buffers(GuiWindow* w) {
  * @param out_w Pointeur vers la largeur retournée (peut être NULL).
  * @param out_h Pointeur vers la hauteur retournée (peut être NULL).
  */
+/**
+ * @brief Function gui_get_framebuffer_size.
+ *
+ * @param w Parameter w.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @return None.
+ */
+/**
+ * @brief Function gui_get_framebuffer_size.
+ *
+ * @param w Parameter w.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @return None.
+ */
 void gui_get_framebuffer_size(GuiWindow* w, int* out_w, int* out_h) {
     if (!w || !w->handle) {
         if (out_w) *out_w = 0;
@@ -159,6 +251,22 @@ void gui_get_framebuffer_size(GuiWindow* w, int* out_w, int* out_h) {
     if (out_h) *out_h = fh;
 }
 
+/**
+ * @brief Function gui_get_mouse_pos.
+ *
+ * @param w Parameter w.
+ * @param out_x Parameter out_x.
+ * @param out_y Parameter out_y.
+ * @return None.
+ */
+/**
+ * @brief Function gui_get_mouse_pos.
+ *
+ * @param w Parameter w.
+ * @param out_x Parameter out_x.
+ * @param out_y Parameter out_y.
+ * @return None.
+ */
 void gui_get_mouse_pos(GuiWindow* w, double* out_x, double* out_y) {
     if (!w || !w->handle) {
         if (out_x) *out_x = 0.0;
@@ -168,16 +276,56 @@ void gui_get_mouse_pos(GuiWindow* w, double* out_x, double* out_y) {
     glfwGetCursorPos(w->handle, out_x, out_y);
 }
 
+/**
+ * @brief Function gui_mouse_button_down.
+ *
+ * @param w Parameter w.
+ * @param button Parameter button.
+ * @return Result value.
+ */
+/**
+ * @brief Function gui_mouse_button_down.
+ *
+ * @param w Parameter w.
+ * @param button Parameter button.
+ * @return Result value.
+ */
 bool gui_mouse_button_down(GuiWindow* w, int button) {
     if (!w || !w->handle) return false;
     return glfwGetMouseButton(w->handle, button) == GLFW_PRESS;
 }
 
+/**
+ * @brief Function gui_key_down.
+ *
+ * @param w Parameter w.
+ * @param key Parameter key.
+ * @return Result value.
+ */
+/**
+ * @brief Function gui_key_down.
+ *
+ * @param w Parameter w.
+ * @param key Parameter key.
+ * @return Result value.
+ */
 bool gui_key_down(GuiWindow* w, int key) {
     if (!w || !w->handle) return false;
     return glfwGetKey(w->handle, key) == GLFW_PRESS;
 }
 
+/**
+ * @brief Function gui_get_time_seconds.
+ *
+ * @return Result value.
+ */
+/**
+ * @brief Function gui_get_time_seconds.
+ *
+ * @return Result value.
+ */
 double gui_get_time_seconds(void) {
     return glfwGetTime();
 }
+
+

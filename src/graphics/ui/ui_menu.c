@@ -20,8 +20,16 @@
 #include <string.h>
 
 /**
- * @brief Supprime le dernier caractère du nom du joueur actuellement sélectionné.
- * @param game Pointeur vers l'état global.
+ * @brief Function menu_apply_backspace.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
+/**
+ * @brief Function menu_apply_backspace.
+ *
+ * @param game Parameter game.
+ * @return None.
  */
 static void menu_apply_backspace(GuiGame *game) {
     if (game->menu_selected_name < 0 || game->menu_selected_name >= 4) {
@@ -36,9 +44,18 @@ static void menu_apply_backspace(GuiGame *game) {
 }
 
 /**
- * @brief Ajoute un caractère au nom du joueur sélectionné, dans la limite de 15 caractères.
- * @param game Pointeur vers l'état global.
- * @param c Caractère à ajouter.
+ * @brief Function menu_append_char.
+ *
+ * @param game Parameter game.
+ * @param c Parameter c.
+ * @return None.
+ */
+/**
+ * @brief Function menu_append_char.
+ *
+ * @param game Parameter game.
+ * @param c Parameter c.
+ * @return None.
  */
 static void menu_append_char(GuiGame *game, char c) {
     if (game->menu_selected_name < 0 || game->menu_selected_name >= 4) {
@@ -53,6 +70,20 @@ static void menu_append_char(GuiGame *game, char c) {
     name[len + 1] = '\0';
 }
 
+/**
+ * @brief Function menu_handle_keyboard.
+ *
+ * @param game Parameter game.
+ * @param w Parameter w.
+ * @return None.
+ */
+/**
+ * @brief Function menu_handle_keyboard.
+ *
+ * @param game Parameter game.
+ * @param w Parameter w.
+ * @return None.
+ */
 static void menu_handle_keyboard(GuiGame *game, GuiWindow *w) {
     if (game->menu_selected_name < 0) {
         return;
@@ -79,6 +110,18 @@ static void menu_handle_keyboard(GuiGame *game, GuiWindow *w) {
     }
 }
 
+/**
+ * @brief Function menu_start_match.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
+/**
+ * @brief Function menu_start_match.
+ *
+ * @param game Parameter game.
+ * @return None.
+ */
 static void menu_start_match(GuiGame *game) {
     if (game->players_initialized) {
         free_players(game->players, game->num_players);
@@ -141,11 +184,22 @@ static void menu_start_match(GuiGame *game) {
 }
 
 /**
- * @brief Gère le rendu et les interactions du menu principal.
- * - Permet de modifier le nombre de joueurs (2 à 4).
- * - Gère la sélection des champs de texte pour les noms.
- * - Permet de basculer entre joueur humain et IA.
- * - Lance la partie via le bouton "JOUER".
+ * @brief Function ui_menu_render.
+ *
+ * @param game Parameter game.
+ * @param w Parameter w.
+ * @param fb_w Parameter fb_w.
+ * @param fb_h Parameter fb_h.
+ * @return None.
+ */
+/**
+ * @brief Function ui_menu_render.
+ *
+ * @param game Parameter game.
+ * @param w Parameter w.
+ * @param fb_w Parameter fb_w.
+ * @param fb_h Parameter fb_h.
+ * @return None.
  */
 void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
     Rect panel = rect_make(fb_w * 0.2f, fb_h * 0.15f, fb_w * 0.6f, fb_h * 0.7f);
@@ -254,3 +308,5 @@ void ui_menu_render(GuiGame *game, GuiWindow *w, int fb_w, int fb_h) {
 
     menu_handle_keyboard(game, w);
 }
+
+

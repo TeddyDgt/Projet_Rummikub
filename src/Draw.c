@@ -4,10 +4,18 @@
 #include <stdlib.h>
 
 /**
- * @brief Mélange les tuiles d'un tableau de manière aléatoire.
- * Utilise l'algorithme de Fisher-Yates.
- * @param array Tableau de tuiles à mélanger.
- * @param n Nombre d'éléments dans le tableau.
+ * @brief Function shuffle.
+ *
+ * @param array Parameter array.
+ * @param n Parameter n.
+ * @return None.
+ */
+/**
+ * @brief Function shuffle.
+ *
+ * @param array Parameter array.
+ * @param n Parameter n.
+ * @return None.
  */
 void shuffle(Tile *array, unsigned int n) {
   if (n > 1) {
@@ -21,9 +29,16 @@ void shuffle(Tile *array, unsigned int n) {
 }
 
 /**
- * @brief Initialise le deck avec les 106 tuiles réglementaires.
- * Comprend deux sets de chaque couleur (1 à 13) et deux jokers, puis mélange le tout.
- * @param d Pointeur vers le deck à initialiser.
+ * @brief Initializes deck.
+ *
+ * @param d Parameter d.
+ * @return None.
+ */
+/**
+ * @brief Function init_deck.
+ *
+ * @param d Parameter d.
+ * @return None.
  */
 void init_deck(Deck *d) {
   int index = 0;
@@ -52,9 +67,16 @@ void init_deck(Deck *d) {
 }
 
 /**
- * @brief Pioche une tuile au sommet du deck.
- * @param d Pointeur vers le deck.
- * @return La tuile piochée ou une tuile d'erreur si vide.
+ * @brief Draws tile.
+ *
+ * @param d Parameter d.
+ * @return Result value.
+ */
+/**
+ * @brief Function draw_tile.
+ *
+ * @param d Parameter d.
+ * @return Result value.
  */
 Tile draw_tile(Deck *d) {
   if (d->top <= 0) {

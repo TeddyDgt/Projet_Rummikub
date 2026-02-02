@@ -5,6 +5,24 @@
 
 #include <stdio.h>
 
+/**
+ * @brief Function tile_base_color.
+ *
+ * @param t Parameter t.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @return None.
+ */
+/**
+ * @brief Function tile_base_color.
+ *
+ * @param t Parameter t.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @return None.
+ */
 static void tile_base_color(const Tile *t, float *r, float *g, float *b) {
     if (!t || t->is_joker) {
         *r = 0.90f;
@@ -42,6 +60,24 @@ static void tile_base_color(const Tile *t, float *r, float *g, float *b) {
     }
 }
 
+/**
+ * @brief Function tile_text_color.
+ *
+ * @param t Parameter t.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @return None.
+ */
+/**
+ * @brief Function tile_text_color.
+ *
+ * @param t Parameter t.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @return None.
+ */
 static void tile_text_color(const Tile *t, float *r, float *g, float *b) {
     float br = 0.85f, bg = 0.85f, bb = 0.85f;
     tile_base_color(t, &br, &bg, &bb);
@@ -58,14 +94,26 @@ static void tile_text_color(const Tile *t, float *r, float *g, float *b) {
 }
 
 /**
- * @brief Rendu complet d'une tuile avec ses différents états.
- * Dessine le fond coloré, la valeur (ou 'J' pour Joker) et les bordures contextuelles (sélection, survol, pression).
- * @param r Rectangle de rendu.
- * @param t Pointeur vers la tuile logique à afficher.
- * @param selected true si la tuile est sélectionnée par le joueur.
- * @param highlight true si la tuile appartient à la combinaison active sur la table.
- * @param hovered true si la souris survole la tuile.
- * @param pressed true si le bouton de la souris est enfoncé sur la tuile.
+ * @brief Function ui_draw_tile.
+ *
+ * @param r Parameter r.
+ * @param t Parameter t.
+ * @param selected Parameter selected.
+ * @param highlight Parameter highlight.
+ * @param hovered Parameter hovered.
+ * @param pressed Parameter pressed.
+ * @return None.
+ */
+/**
+ * @brief Function ui_draw_tile.
+ *
+ * @param r Parameter r.
+ * @param t Parameter t.
+ * @param selected Parameter selected.
+ * @param highlight Parameter highlight.
+ * @param hovered Parameter hovered.
+ * @param pressed Parameter pressed.
+ * @return None.
  */
 void ui_draw_tile(Rect r, const Tile *t, bool selected, bool highlight, bool hovered, bool pressed) {
     float tr = 0.85f, tg = 0.85f, tb = 0.85f;
@@ -116,3 +164,5 @@ void ui_draw_tile(Rect r, const Tile *t, bool selected, bool highlight, bool hov
         r2d_fill_rect(r.x, r.y, r.w, r.h, 0.0f, 0.0f, 0.0f, 0.25f);
     }
 }
+
+

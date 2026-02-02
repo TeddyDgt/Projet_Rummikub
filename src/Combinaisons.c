@@ -1,12 +1,8 @@
 #include "Combinaisons.h"
 #include "./structs.h"
 #include <stdlib.h>
-/**
- * @brief Vérifie si une combinaison est un groupe valide.
- * Un groupe est composé de 3 à 4 tuiles de même valeur mais de couleurs différentes.
- * @param c Pointeur vers la combinaison à vérifier.
- * @return 1 si valide, 0 sinon.
- */int is_valid_group(Combinaison *c) {
+// On veut un groupe de 3 à 4 tuiles de même valeur mais de couleur différente
+int is_valid_group(Combinaison *c) {
   if (c->count < 3 || c->count > 4)
     return 0;
 
@@ -29,13 +25,6 @@
   return 1;
 }
 
-/**
- * @brief Vérifie si une combinaison est une suite valide.
- * Une suite est composée d'au moins 3 tuiles de même couleur et de valeurs incrémentales.
- * Gère le calcul des valeurs virtuelles en présence de jokers.
- * @param c Pointeur vers la combinaison à vérifier.
- * @return 1 si valide, 0 sinon.
- */
 // On veut une suite d'au moins 3 tuiles de même couleur et de valeur
 // incrémentale (1, 2, 3 etc...)
 int is_valid_suite(Combinaison *c) {
@@ -84,12 +73,20 @@ int is_valid_suite(Combinaison *c) {
 }
 
 /**
- * @brief Tente d'ajouter une tuile à une combinaison existante sur la table.
- * Si l'ajout rend la combinaison invalide, l'opération est annulée.
- * @param t Pointeur vers la table de jeu.
- * @param comb_idx Index de la combinaison cible.
- * @param new_tile La tuile à ajouter.
- * @return 1 si succès, 0 si invalide.
+ * @brief Adds tile to table comb.
+ *
+ * @param t Parameter t.
+ * @param comb_idx Parameter comb_idx.
+ * @param new_tile Parameter new_tile.
+ * @return Result value.
+ */
+/**
+ * @brief Function add_tile_to_table_comb.
+ *
+ * @param t Parameter t.
+ * @param comb_idx Parameter comb_idx.
+ * @param new_tile Parameter new_tile.
+ * @return Result value.
  */
 int add_tile_to_table_comb(Table *t, int comb_idx, Tile new_tile) {
   if (comb_idx < 0 || comb_idx >= t->count)
@@ -116,16 +113,33 @@ int add_tile_to_table_comb(Table *t, int comb_idx, Tile new_tile) {
   }
 }
 
+/**
+ * @brief Checks whether valid combination.
+ *
+ * @param c Parameter c.
+ * @return Result value.
+ */
+/**
+ * @brief Function is_valid_combination.
+ *
+ * @param c Parameter c.
+ * @return Result value.
+ */
 int is_valid_combination(Combinaison *c) {
   return is_valid_group(c) || is_valid_suite(c);
 }
 
 /**
- * @brief Calcule la valeur totale en points d'une combinaison.
- * Pour un groupe, le score est $valeur \times nombre\_de\_tuiles$.
- * Pour une suite, le score est la somme des valeurs (incluant les jokers).
- * @param c Pointeur vers la combinaison.
- * @return Le score total ou 0 si la combinaison est invalide.
+ * @brief Function combinaison_points.
+ *
+ * @param c Parameter c.
+ * @return Result value.
+ */
+/**
+ * @brief Function combinaison_points.
+ *
+ * @param c Parameter c.
+ * @return Result value.
  */
 int combinaison_points(const Combinaison *c) {
   if (!c || c->count <= 0 || !c->tiles) {
@@ -173,3 +187,5 @@ int combinaison_points(const Combinaison *c) {
 
   return 0;
 }
+
+

@@ -7,9 +7,16 @@
 #include <string.h>
 
 /**
- * @brief Initialise la structure de la table.
- * Met le compteur de combinaisons à zéro et initialise tous les pointeurs de tuiles à NULL.
- * @param t Pointeur vers la table à initialiser.
+ * @brief Initializes table.
+ *
+ * @param t Parameter t.
+ * @return None.
+ */
+/**
+ * @brief Function init_table.
+ *
+ * @param t Parameter t.
+ * @return None.
  */
 void init_table(Table *t) {
   t->count = 0;
@@ -21,10 +28,16 @@ void init_table(Table *t) {
 }
 
 /**
- * @brief Effectue une copie profonde d'une combinaison.
- * Alloue dynamiquement un nouveau tableau de tuiles et y copie les données de la source.
- * @param src Pointeur vers la combinaison source à copier.
- * @return Une nouvelle structure Combinaison avec sa propre mémoire allouée.
+ * @brief Function deep_copy_combinaison.
+ *
+ * @param src Parameter src.
+ * @return Result value.
+ */
+/**
+ * @brief Function deep_copy_combinaison.
+ *
+ * @param src Parameter src.
+ * @return Result value.
  */
 static Combinaison deep_copy_combinaison(const Combinaison *src) {
   Combinaison c;
@@ -50,11 +63,18 @@ static Combinaison deep_copy_combinaison(const Combinaison *src) {
 }
 
 /**
- * @brief Ajoute une combinaison à la table de jeu.
- * Utilise une copie profonde pour s'assurer que la table possède sa propre instance des tuiles.
- * Affiche une erreur si la limite MAX_COMB est atteinte.
- * @param t Pointeur vers la table.
- * @param c La combinaison à ajouter.
+ * @brief Adds combinaison to table.
+ *
+ * @param t Parameter t.
+ * @param c Parameter c.
+ * @return None.
+ */
+/**
+ * @brief Function add_combinaison_to_table.
+ *
+ * @param t Parameter t.
+ * @param c Parameter c.
+ * @return None.
  */
 void add_combinaison_to_table(Table *t, Combinaison c) {
   if (!t)
@@ -71,10 +91,16 @@ void add_combinaison_to_table(Table *t, Combinaison c) {
 }
 
 /**
- * @brief Vérifie l'intégrité de l'ensemble du plateau.
- * Parcourt chaque combinaison sur la table et valide si elle respecte toujours les règles.
- * @param t Pointeur vers la table.
- * @return 1 si tout le plateau est valide, 0 si au moins une combinaison est incorrecte.
+ * @brief Function verify_whole_table.
+ *
+ * @param t Parameter t.
+ * @return Result value.
+ */
+/**
+ * @brief Function verify_whole_table.
+ *
+ * @param t Parameter t.
+ * @return Result value.
  */
 int verify_whole_table(Table *t) {
   if (!t)
@@ -88,10 +114,16 @@ int verify_whole_table(Table *t) {
 }
 
 /**
- * @brief Crée un clone complet d'une table existante.
- * Utile pour simuler des coups sans modifier l'état réel du jeu.
- * @param src Pointeur vers la table source.
- * @return Une nouvelle structure Table contenant des copies indépendantes des combinaisons.
+ * @brief Clones table.
+ *
+ * @param src Parameter src.
+ * @return Result value.
+ */
+/**
+ * @brief Function clone_table.
+ *
+ * @param src Parameter src.
+ * @return Result value.
  */
 Table clone_table(Table *src) {
   Table dst;
@@ -109,9 +141,16 @@ Table clone_table(Table *src) {
 }
 
 /**
- * @brief Libère la mémoire de toutes les combinaisons sur la table.
- * Parcourt la table pour libérer chaque tableau de tuiles alloué dynamiquement.
- * @param t Pointeur vers la table à nettoyer.
+ * @brief Frees table.
+ *
+ * @param t Parameter t.
+ * @return None.
+ */
+/**
+ * @brief Function free_table.
+ *
+ * @param t Parameter t.
+ * @return None.
  */
 void free_table(Table *t) {
   if (!t)
@@ -124,3 +163,5 @@ void free_table(Table *t) {
   }
   t->count = 0;
 }
+
+
