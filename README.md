@@ -15,5 +15,3 @@ L'ensemble de la documentation du projet est disponible dans le dossier [`/docs`
 
 Le rapport d'analyse et de conception (à remettre le 30 novembre 2025) est accessible ici :  
  [`/docs/rapport_analyse.md`](./docs/rapport_analyse.md)
-
-### Installation

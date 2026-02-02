@@ -139,14 +139,9 @@ void draw_player_list(const MatchLayout *layout, const GuiGame *game) {
         ui_draw_text(panel.x + 10.0f, panel.y + 12.0f, 1.5f, game->players[i].name,
                      0.96f, 0.96f, 0.96f, 1.0f);
         char info[64];
-        if (i == game->current_player) {
-            int display_score = -calculate_hand_penalty((Player *)&game->players[i]);
-            snprintf(info, sizeof(info), "Score: %d%s", display_score,
-                     game->players[i].is_ai ? " (IA)" : "");
-        } else {
-            snprintf(info, sizeof(info), "Score: ?%s",
-                     game->players[i].is_ai ? " (IA)" : "");
-        }
+        int display_score = -calculate_hand_penalty((Player *)&game->players[i]);
+        snprintf(info, sizeof(info), "Score: %d%s", display_score,
+                 game->players[i].is_ai ? " (IA)" : "");
         ui_draw_text(panel.x + 10.0f, panel.y + 36.0f, 1.1f, info,
                      0.88f, 0.88f, 0.88f, 1.0f);
     }

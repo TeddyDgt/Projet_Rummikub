@@ -1,4 +1,3 @@
-3
+2
 FEUR,1
 Joueur 2,0
-Joueur 3,0
