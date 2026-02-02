@@ -57,6 +57,16 @@ static void tile_text_color(const Tile *t, float *r, float *g, float *b) {
     }
 }
 
+/**
+ * @brief Rendu complet d'une tuile avec ses différents états.
+ * Dessine le fond coloré, la valeur (ou 'J' pour Joker) et les bordures contextuelles (sélection, survol, pression).
+ * @param r Rectangle de rendu.
+ * @param t Pointeur vers la tuile logique à afficher.
+ * @param selected true si la tuile est sélectionnée par le joueur.
+ * @param highlight true si la tuile appartient à la combinaison active sur la table.
+ * @param hovered true si la souris survole la tuile.
+ * @param pressed true si le bouton de la souris est enfoncé sur la tuile.
+ */
 void ui_draw_tile(Rect r, const Tile *t, bool selected, bool highlight, bool hovered, bool pressed) {
     float tr = 0.85f, tg = 0.85f, tb = 0.85f;
     tile_base_color(t, &tr, &tg, &tb);

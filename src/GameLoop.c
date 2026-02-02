@@ -7,6 +7,12 @@
 #include <string.h>
 #include <time.h>
 
+/**
+ * @brief Distribue 14 tuiles initiales à chaque joueur et trie leur main par défaut.
+ * @param d Pointeur vers le deck.
+ * @param players Tableau des joueurs.
+ * @param num_players Nombre de joueurs.
+ */
 void distribute_initial_tiles(Deck *d, Player players[], int num_players) {
   for (int p = 0; p < num_players; p++) {
     for (int i = 0; i < HAND_SIZE_START; i++) {
@@ -16,6 +22,7 @@ void distribute_initial_tiles(Deck *d, Player players[], int num_players) {
     sort_player_hand(&players[p], 1);
   }
 }
+
 
 int determine_first_player(Deck *d, int num_players) {
   int best_idx = 0;
@@ -38,6 +45,12 @@ int is_game_over(Player players[], int num_players, Deck *d) {
   return (d->top <= 0);
 }
 
+/**
+ * @brief Calcule les scores finaux et affiche le tableau des scores.
+ * Le gagnant reçoit la somme des pénalités des perdants.
+ * @param players Tableau des joueurs.
+ * @param num_players Nombre de joueurs.
+ */
 void calculate_final_scores(Player players[], int num_players) {
   if (!players || num_players <= 0) {
     return;
@@ -132,6 +145,13 @@ static int find_score_entry(char names[][64], int count, const char *name) {
   return -1;
 }
 
+/**
+ * @brief Sauvegarde les scores dans un fichier texte avec un horodatage.
+ * Si le joueur existe déjà dans le fichier, les nouveaux scores sont additionnés aux anciens.
+ * @param players Tableau des joueurs.
+ * @param num_players Nombre de joueurs.
+ * @param filename Nom du fichier de destination.
+ */
 void save_scores_to_file(Player players[], int num_players, char *filename) {
   if (!players || num_players <= 0 || !filename) {
     return;
